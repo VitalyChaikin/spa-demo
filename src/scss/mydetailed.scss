@@ -1,0 +1,88 @@
+.MyDetailed {
+  text-align: left;
+}
+
+.inputField {
+  margin: 1em;
+}
+
+.inputFieldLabel {
+  margin-right: 0.35em;
+}
+
+#inpuId {
+  width: 2em;
+}
+
+#inputType,
+#inputPrice {
+  width: 6em;
+}
+
+#inputDesc {
+  width: 15em;
+}
+
+#inputInfo {
+  width: 35em;
+}
+
+.tabs {
+  width: 100%;
+  padding: 0px;
+  margin: 0 auto;
+}
+.tabs > input {
+  display: none;
+}
+.tabs > div {
+  display: none;
+  padding: 12px;
+  border: 1px solid #c0c0c0;
+  background: #ffffff;
+}
+.tabs > label {
+  display: inline-block;
+  padding: 7px;
+  margin: 0 -5px -1px 0;
+  text-align: center;
+  color: #666666;
+  border: 1px solid #c0c0c0;
+  background: #e0e0e0;
+  cursor: pointer;
+}
+.tabs > input:checked + label {
+  color: #000000;
+  border: 1px solid #c0c0c0;
+  border-bottom: 1px solid #ffffff;
+  background: #ffffff;
+}
+#tab_1:checked ~ #txt_1,
+#tab_2:checked ~ #txt_2,
+#tab_3:checked ~ #txt_3,
+#tab_4:checked ~ #txt_4 {
+  display: block;
+}
+
+.bBack {
+  border: none;
+  // outline: none;
+  background-color: white;
+  //font-family: Arial, Helvetica, sans-serif;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1),
+    -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1),
+    -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+  font-size: larger;
+  //letter-spacing: 2px;
+  transition: 0.3s all linear;
+}
+
+.bBack:hover {
+  border-left: 9px solid #4638ff;
+  border-right: 9px solid #4638ff;
+}

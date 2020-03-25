@@ -1,0 +1,44 @@
+@mixin stdColumnStyle($defWidth: 5em) {
+  text-align: center;
+  width: $defWidth;
+}
+
+.MyFiles {
+  flex: 1;
+  display: flex;
+}
+
+.MyFilesLeftPanel,
+.MyFilesRightPanel {
+  margin-left: 1em;
+  text-align: left;
+}
+
+.MyFilesLeftPanel {
+  flex-direction: column;
+  text-align: left;
+}
+
+.FilesRightContent {
+  text-align: left;
+  font-size: larger;
+  font-style: italic;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.FilesRightContentText {
+  margin-left: 0.5em;
+}
+
+.author,
+.book {
+  text-align: center;
+}
+
+.tdauthor {
+  @include stdColumnStyle(8em);
+}
+
+.tdbook {
+  @include stdColumnStyle(17em);
+}

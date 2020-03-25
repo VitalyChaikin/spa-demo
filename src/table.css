@@ -1,0 +1,144 @@
+@charset "UTF-8";
+.DataTable {
+  background-color: #666699;
+  color: #ffffe6;
+  font-size: larger;
+  border-radius: 15px;
+  padding: 5px;
+  width: 100%;
+  flex: 1;
+}
+
+.DataRow0 {
+  background-color: blueviolet;
+  color: yellow;
+}
+
+.DataRow0:hover {
+  color: greenyellow;
+  cursor: pointer;
+}
+
+.DataRow:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
+.imagePokemon {
+  height: 200px;
+  width: 200px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: block;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: black;
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  border-radius: 15px;
+  min-width: 408px;
+  max-width: 720px;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.id,
+.type,
+.name,
+.price,
+.desc {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.id:hover,
+.type:hover,
+.name:hover,
+.price:hover,
+.desc:hover {
+  color: red;
+}
+
+#sortColumn1,
+#sortColumn-1 {
+  color: yellow;
+}
+
+#sortColumn1::after {
+  content: ' ⇡';
+  position: relative;
+  top: -5 px;
+  left: -5px;
+}
+
+#sortColumn-1::after {
+  content: ' ⇣';
+  position: relative;
+  top: 5 px;
+  left: -5px;
+}
+
+.tdid {
+  text-align: center;
+  width: 4em;
+}
+
+.tdtype {
+  text-align: left;
+  width: 5em;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.tdname {
+  text-align: left;
+  width: 5em;
+}
+
+.tdprice {
+  text-align: center;
+  width: 5em;
+}
+
+.tddesc {
+  text-align: left;
+  width: 15em;
+}

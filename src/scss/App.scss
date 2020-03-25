@@ -1,0 +1,16 @@
+@import './header.scss';
+@import './table.scss';
+@import './mysearch.scss';
+@import './mylist.scss';
+@import './myfiles.scss';
+@import './mydetailed.scss';
+
+.App {
+  font-family: 'Trebuchet MS', 'Lucida Sans';
+  text-align: center;
+}
+
+.NavWorkarea {
+  flex: 1;
+  display: flex;
+}

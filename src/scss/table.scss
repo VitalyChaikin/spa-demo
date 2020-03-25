@@ -1,0 +1,149 @@
+@mixin introFont {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-style: italic;
+}
+
+@mixin stdColumnStyle($defWidth: 5em) {
+  text-align: center;
+  width: $defWidth;
+}
+
+@mixin stdColumnStyleLeft($defWidth: 5em) {
+  text-align: left;
+  width: $defWidth;
+}
+
+@mixin strelka($updown) {
+  @if $updown == 1 {
+    content: ' ⇡';
+  } @else {
+    content: ' ⇣';
+  }
+  position: relative;
+  top: (-5 * $updown) px;
+  left: -5px;
+}
+
+.DataTable {
+  background-color: #666699;
+  color: #ffffe6;
+  font-size: larger;
+  border-radius: 15px;
+  padding: 5px;
+  width: 100%;
+  flex: 1;
+}
+
+.DataRow0 {
+  background-color: blueviolet;
+  color: yellow;
+}
+
+.DataRow0:hover {
+  color: greenyellow;
+  cursor: pointer;
+}
+
+.DataRow:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
+.imagePokemon {
+  height: 200px;
+  width: 200px;
+}
+
+/* The Modal (background) */
+.modal {
+  display: block; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  border-radius: 15px;
+  min-width: 510px * 0.8;
+  max-width: 900px * 0.8;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.id,
+.type,
+.name,
+.price,
+.desc {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.id:hover,
+.type:hover,
+.name:hover,
+.price:hover,
+.desc:hover {
+  color: red;
+}
+
+#sortColumn1,
+#sortColumn-1 {
+  color: yellow;
+}
+
+#sortColumn1::after {
+  @include strelka(1);
+}
+
+#sortColumn-1::after {
+  @include strelka(-1);
+}
+
+.tdid {
+  @include stdColumnStyle(4em);
+}
+
+.tdtype {
+  @include stdColumnStyleLeft(5em);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.tdname {
+  @include stdColumnStyleLeft(5em);
+}
+
+.tdprice {
+  @include stdColumnStyle;
+}
+
+.tddesc {
+  @include stdColumnStyleLeft(15em);
+}

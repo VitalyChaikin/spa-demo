@@ -1,0 +1,29 @@
+.Header,
+.Footer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: larger;
+  background-color: #666699;
+  color: #ffffe6;
+  border-radius: 15px;
+  min-height: 2.5em;
+  border: solid;
+  border-color: white;
+  flex-wrap: wrap;
+  position: sticky;
+
+  border: solid;
+  border-color: white;
+}
+
+.logo {
+  position: absolute;
+  margin-left: 1em;
+}
+
+.logo,
+.info {
+  flex: 1;
+  display: block;
+}

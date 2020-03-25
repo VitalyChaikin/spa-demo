@@ -1,0 +1,69 @@
+.MySearch,
+.MyDetailedF9 {
+  flex: 1;
+  display: flex;
+}
+
+.MySearchLeftPanel,
+.MySearchRightPanel,
+.MyDetailedF9 {
+  margin-left: 1em;
+}
+
+.MySearchLeftPanel {
+  flex-direction: column;
+  max-width: 15em;
+}
+
+.hTextInfo {
+  text-align: left;
+}
+
+.hSearch,
+.hSearchType {
+  margin-bottom: 0.5em;
+  text-align: left;
+}
+
+#sExpression {
+  margin-left: 0.725em;
+}
+
+#sType {
+  margin-left: 0.25em;
+}
+
+.bClear {
+  margin-left: 1em;
+}
+
+.bSearch,
+.bClear {
+  border: none;
+  background-color: white;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1),
+    -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1),
+    -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+  font-size: larger;
+  transition: 0.3s all linear;
+}
+
+.bSearch:hover {
+  border-left: 9px solid #4638ff;
+  border-right: 9px solid #4638ff;
+}
+
+.bClear:hover {
+  border-left: 9px solid #ff6d6d;
+  border-right: 9px solid #ff6d6d;
+}
+
+.lKey {
+  background-color: blueviolet;
+  color: white;
+}

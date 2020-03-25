@@ -1,0 +1,399 @@
+@charset "UTF-8";
+.Header,
+.Footer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: larger;
+  background-color: #666699;
+  color: #ffffe6;
+  border-radius: 15px;
+  min-height: 2.5em;
+  border: solid;
+  border-color: white;
+  flex-wrap: wrap;
+  position: sticky;
+  border: solid;
+  border-color: white; }
+
+.logo {
+  position: absolute;
+  margin-left: 1em; }
+
+.logo,
+.info {
+  flex: 1;
+  display: block; }
+
+.DataTable {
+  background-color: #666699;
+  color: #ffffe6;
+  font-size: larger;
+  border-radius: 15px;
+  padding: 5px;
+  width: 100%;
+  flex: 1; }
+
+.DataRow0 {
+  background-color: blueviolet;
+  color: yellow; }
+
+.DataRow0:hover {
+  color: greenyellow;
+  cursor: pointer; }
+
+.DataRow:hover {
+  color: yellow;
+  cursor: pointer; }
+
+.imagePokemon {
+  height: 200px;
+  width: 200px; }
+
+/* The Modal (background) */
+.modal {
+  display: block;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
+  padding-top: 100px;
+  /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: black;
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */ }
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  border-radius: 15px;
+  min-width: 408px;
+  max-width: 720px; }
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold; }
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer; }
+
+.id,
+.type,
+.name,
+.price,
+.desc {
+  cursor: pointer;
+  white-space: nowrap; }
+
+.id:hover,
+.type:hover,
+.name:hover,
+.price:hover,
+.desc:hover {
+  color: red; }
+
+#sortColumn1,
+#sortColumn-1 {
+  color: yellow; }
+
+#sortColumn1::after {
+  content: ' ⇡';
+  position: relative;
+  top: -5 px;
+  left: -5px; }
+
+#sortColumn-1::after {
+  content: ' ⇣';
+  position: relative;
+  top: 5 px;
+  left: -5px; }
+
+.tdid {
+  text-align: center;
+  width: 4em; }
+
+.tdtype {
+  text-align: left;
+  width: 5em;
+  text-transform: capitalize;
+  white-space: nowrap; }
+
+.tdname {
+  text-align: left;
+  width: 5em; }
+
+.tdprice {
+  text-align: center;
+  width: 5em; }
+
+.tddesc {
+  text-align: left;
+  width: 15em; }
+
+.MySearch,
+.MyDetailedF9 {
+  flex: 1;
+  display: flex; }
+
+.MySearchLeftPanel,
+.MySearchRightPanel,
+.MyDetailedF9 {
+  margin-left: 1em; }
+
+.MySearchLeftPanel {
+  flex-direction: column;
+  max-width: 15em; }
+
+.hTextInfo {
+  text-align: left; }
+
+.hSearch,
+.hSearchType {
+  margin-bottom: 0.5em;
+  text-align: left; }
+
+#sExpression {
+  margin-left: 0.725em; }
+
+#sType {
+  margin-left: 0.25em; }
+
+.bClear {
+  margin-left: 1em; }
+
+.bSearch,
+.bClear {
+  border: none;
+  background-color: white;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1), -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1), -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+  font-size: larger;
+  transition: 0.3s all linear; }
+
+.bSearch:hover {
+  border-left: 9px solid #4638ff;
+  border-right: 9px solid #4638ff; }
+
+.bClear:hover {
+  border-left: 9px solid #ff6d6d;
+  border-right: 9px solid #ff6d6d; }
+
+.lKey {
+  background-color: blueviolet;
+  color: white; }
+
+.MyList {
+  flex: 1;
+  display: flex; }
+
+.MyListRightPanel {
+  font-family: 'Trebuchet MS', 'Lucida Sans';
+  margin-left: 0.5em;
+  text-align: left; }
+
+.ulMyList-li-2line {
+  font-size: smaller;
+  font-style: italic; }
+
+.ulMyList,
+.ulNavPanel {
+  list-style: none;
+  padding: 0;
+  margin-left: 0.5em; }
+
+.ulMyList li,
+.ulNavPanel li {
+  font-family: 'Trebuchet MS', 'Lucida Sans';
+  padding: 7px 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 10px solid #f05d22;
+  border-right: 10px solid transparent;
+  box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1), -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1), -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+  font-size: 20px;
+  letter-spacing: 2px;
+  transition: 0.3s all linear; }
+
+.ulMyList li:nth-child(2),
+.ulNavPanel li:nth-child(2) {
+  border-color: #8bc63e;
+  border-right: 10px solid transparent; }
+
+.ulMyList li:nth-child(3),
+.ulNavPanel li:nth-child(3) {
+  border-color: #fcba30;
+  border-right: 10px solid transparent; }
+
+.ulMyList li:nth-child(4),
+.ulNavPanel li:nth-child(4) {
+  border-color: #1ccfc9;
+  border-right: 10px solid transparent; }
+
+.ulMyList li:nth-child(5),
+.ulNavPanel li:nth-child(5) {
+  border-color: #493224;
+  border-right: 10px solid transparent; }
+
+.ulMyList li:hover,
+.ulNavPanel li:hover {
+  border-left: 10px solid transparent; }
+
+.ulMyList li:nth-child(1):hover,
+.ulNavPanel li:nth-child(1):hover {
+  border-right: 10px solid #f05d22; }
+
+.ulMyList li:nth-child(2):hover,
+.ulNavPanel li:nth-child(2):hover {
+  border-right: 10px solid #8bc63e; }
+
+.ulMyList li:nth-child(3):hover,
+.ulNavPanel li:nth-child(3):hover {
+  border-right: 10px solid #fcba30; }
+
+.ulMyList li:nth-child(4):hover,
+.ulNavPanel li:nth-child(4):hover {
+  border-right: 10px solid #1ccfc9; }
+
+.ulMyList li:nth-child(5):hover,
+.ulNavPanel li:nth-child(5):hover {
+  border-right: 10px solid #493224; }
+
+.MyFiles {
+  flex: 1;
+  display: flex; }
+
+.MyFilesLeftPanel,
+.MyFilesRightPanel {
+  margin-left: 1em;
+  text-align: left; }
+
+.MyFilesLeftPanel {
+  flex-direction: column;
+  text-align: left; }
+
+.FilesRightContent {
+  text-align: left;
+  font-size: larger;
+  font-style: italic;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+.FilesRightContentText {
+  margin-left: 0.5em; }
+
+.author,
+.book {
+  text-align: center; }
+
+.tdauthor {
+  text-align: center;
+  width: 8em; }
+
+.tdbook {
+  text-align: center;
+  width: 17em; }
+
+.MyDetailed {
+  text-align: left; }
+
+.inputField {
+  margin: 1em; }
+
+.inputFieldLabel {
+  margin-right: 0.35em; }
+
+#inpuId {
+  width: 2em; }
+
+#inputType,
+#inputPrice {
+  width: 6em; }
+
+#inputDesc {
+  width: 15em; }
+
+#inputInfo {
+  width: 35em; }
+
+.tabs {
+  width: 100%;
+  padding: 0px;
+  margin: 0 auto; }
+
+.tabs > input {
+  display: none; }
+
+.tabs > div {
+  display: none;
+  padding: 12px;
+  border: 1px solid #c0c0c0;
+  background: #ffffff; }
+
+.tabs > label {
+  display: inline-block;
+  padding: 7px;
+  margin: 0 -5px -1px 0;
+  text-align: center;
+  color: #666666;
+  border: 1px solid #c0c0c0;
+  background: #e0e0e0;
+  cursor: pointer; }
+
+.tabs > input:checked + label {
+  color: #000000;
+  border: 1px solid #c0c0c0;
+  border-bottom: 1px solid #ffffff;
+  background: #ffffff; }
+
+#tab_1:checked ~ #txt_1,
+#tab_2:checked ~ #txt_2,
+#tab_3:checked ~ #txt_3,
+#tab_4:checked ~ #txt_4 {
+  display: block; }
+
+.bBack {
+  border: none;
+  background-color: white;
+  padding: 3px 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1), -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1), -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
+  font-size: larger;
+  transition: 0.3s all linear; }
+
+.bBack:hover {
+  border-left: 9px solid #4638ff;
+  border-right: 9px solid #4638ff; }
+
+.App {
+  font-family: 'Trebuchet MS', 'Lucida Sans';
+  text-align: center; }
+
+.NavWorkarea {
+  flex: 1;
+  display: flex; }
