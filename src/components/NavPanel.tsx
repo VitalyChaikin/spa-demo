@@ -2,7 +2,7 @@ import React from 'react'
 // import { useStores } from '../hooks/use-stores'
 import { Link } from 'react-router-dom'
 
-const NavPanel = () => {
+const NavPanel = ():React.ReactElement => {
   //const { myStore } = useStores()
   return (
     <div className='NavPanel'>

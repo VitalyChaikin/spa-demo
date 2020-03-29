@@ -5,7 +5,7 @@ import MySearch from './MySearch'
 import MyList from './MyList'
 import MyFiles from './MyFiles'
 
-const Workarea = () => {
+const Workarea = ():React.ReactElement => {
   //const { myStore } = useStores()
   return (
     <div className='Workarea'>

@@ -1,19 +1,33 @@
 import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 // import { useStores } from '../hooks/use-stores'
+import { FuncChangeDetailed } from './MySearch'
 
-const MyDetailed = props => {
+interface IMyDetailedState {
+  isLoaded: boolean,
+  itemsView: Array<any>,
+  idDetailed: number,
+  txtJson: string
+}
+
+export interface IMyDetailedProps {
+  data: Array<any>,
+  idDetailed: number,
+  changeDetailed: FuncChangeDetailed
+}
+
+const MyDetailed = (props:IMyDetailedProps) => {
   const { data: arrData, idDetailed: newIdDetailed, changeDetailed } = props
 
   //const { myStore } = useStores()
-  const inputId = useRef(null)
-  const inputName = useRef(null)
-  const inputType = useRef(null)
-  const inputPrice = useRef(null)
-  const inputDesc = useRef(null)
-  const inputInfo = useRef(null)
+  const inputId:any = useRef<HTMLElement>(null)
+  const inputName:any = useRef<HTMLElement>(null)
+  const inputType:any = useRef<HTMLElement>(null)
+  const inputPrice:any = useRef<HTMLElement>(null)
+  const inputDesc:any = useRef<HTMLElement>(null)
+  const inputInfo:any = useRef<HTMLElement>(null)
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<IMyDetailedState>({
     isLoaded: false,
     itemsView: arrData.filter(value => newIdDetailed === value.id),
     idDetailed: newIdDetailed,
@@ -48,6 +62,7 @@ const MyDetailed = props => {
       .then(
         result => {
           setState({
+            ...state,
             isLoaded: true,
             txtJson: result
           })
@@ -56,6 +71,7 @@ const MyDetailed = props => {
         // чтобы не перехватывать исключения из ошибок в самих компонентах.
         error => {
           setState({
+            ...state,
             isLoaded: true,
             txtJson:
               'Ошибка при загрузке файла http://localhost:3000/filesdata.txt'
@@ -63,6 +79,10 @@ const MyDetailed = props => {
         }
       )
   }, [])
+
+  const onClickBackButton = (event:any) => {
+    changeDetailed()
+  }
 
   return (
     <div className='MyDetailed'>
@@ -134,16 +154,15 @@ const MyDetailed = props => {
             <span className='inputFieldLabel'>Информация</span>
             <br />
             <textarea
-              ref={inputInfo}
-              type='text'
+              ref={inputInfo}              
               className='input-text'
               id='inputInfo'
-              rows='5'
-              cols='35'
+              rows={5}
+              cols={35}
             />
           </div>
           <div className='inputField'>
-            <button className='bBack' onClick={changeDetailed}>
+            <button className='bBack' onClick={onClickBackButton}>
               Назад
             </button>
           </div>
@@ -155,7 +174,7 @@ const MyDetailed = props => {
           </p>
           <pre>{txtJson}</pre>
           <div className='inputField'>
-            <button className='bBack' onClick={changeDetailed}>
+            <button className='bBack' onClick={onClickBackButton}>
               Назад
             </button>
           </div>
@@ -203,7 +222,7 @@ const MyDetailed = props => {
           <br />
           <br /> Виталий
           <div className='inputField'>
-            <button className='bBack' onClick={changeDetailed}>
+            <button className='bBack' onClick={onClickBackButton}>
               Назад
             </button>
           </div>
@@ -221,7 +240,7 @@ const MyDetailed = props => {
             --format скриптом: <i>npm run format</i>
           </p>
           <div className='inputField'>
-            <button className='bBack' onClick={changeDetailed}>
+            <button className='bBack' onClick={onClickBackButton}>
               Назад
             </button>
           </div>

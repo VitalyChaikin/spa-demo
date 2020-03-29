@@ -2,7 +2,7 @@ import React from 'react'
 // import { useStores } from '../hooks/use-stores'
 import logo from './user.svg'
 
-const Header = () => {
+const Header = ():React.ReactElement => {
   //const { myStore } = useStores()  <img src={logo} height="50px" width="50px" alt="Logo" />
   return (
     <div className='Header'>

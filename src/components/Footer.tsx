@@ -1,7 +1,7 @@
 import React from 'react'
 // import { useStores } from '../hooks/use-stores'
 
-const Footer = () => {
+const Footer = ():React.ReactElement => {
   //const { myStore } = useStores()
   return (
     <div className='Footer'>

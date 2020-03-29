@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react'
-// import { observer } from 'mobx-react-lite'
 // import { useStores } from '../hooks/use-stores'
+import {IMySearchState, FuncChangeDetailed} from './MySearch'
+
+interface IRowHeadProps {
+  data: IMySearchState['itemsView'],
+  skipEvents: boolean,
+  changeSortOrder?: any,
+  sortColumn?: IMySearchState['sortColumn'],
+  sortDirection?: IMySearchState['sortDirection'],
+  getColumnName: any
+}
 
 const RowHead = ({
   data: arr,
@@ -8,17 +17,16 @@ const RowHead = ({
   changeSortOrder,
   sortColumn: p_sortColumn,
   sortDirection: p_sortDirection,
-  getColumnName: p_getColumnName
-}) => {
+  getColumnName: p_getColumnName}:IRowHeadProps):React.ReactElement => {
   // const { myStore } = useStores()
   // let p = myStore.myP
 
   //console.log('skipEvents',skipEvents);
-  let sorted
-  let thList = []
+  let sorted: IMySearchState['sortColumn']
+  let thList: Array<any> = []
   if (arr.length === 0) thList.push(<th key='noitems'>Нет данных</th>)
   else {
-    let onClickEvent = undefined
+    let onClickEvent:any = undefined
     if (!skipEvents) onClickEvent = changeSortOrder
     // Use keys of first element for Column names
     Object.keys(arr[0]).forEach((element, key) => {
@@ -26,7 +34,7 @@ const RowHead = ({
       if (!skipEvents)
         if (element === p_sortColumn) {
           // dont decorate sorted column if skipEvent = true
-          sorted = 'sortColumn' + p_sortDirection.toString()
+          sorted = 'sortColumn' + (p_sortDirection === undefined ? '' : p_sortDirection.toString())
           //console.log('RowHead #1 sorted = ', sorted);
         }
       // console.log('RowHead #1 element = ', element);
@@ -50,6 +58,18 @@ const RowHead = ({
   }
   return <tr>{thList}</tr>
 }
+
+
+interface IRowProps {
+  data: IMySearchState['itemsView'],
+  skipEvents: boolean,
+  getColumnName: any,
+  clickOnDataRow?: any,
+  dblClickOnDataRow?: any,
+  row: number,
+  numActiveRow:IMySearchState['numActiveRow']
+}
+
 const Row = ({
   data: line,
   skipEvents,
@@ -57,13 +77,12 @@ const Row = ({
   clickOnDataRow,
   dblClickOnDataRow,
   row,
-  numActiveRow
-}) => {
+  numActiveRow}:IRowProps):React.ReactElement => {
   // const { myStore } = useStores()
   // let p = myStore.myP
 
-  let id = undefined
-  let trColumns = []
+  let id:string | undefined = undefined
+  let trColumns:Array<any> = []
   for (const property in line) {
     let columnName = p_getColumnName(property)
     // console.log('property', property, 'columnName', columnName, !(columnName==='hidden'));
@@ -71,10 +90,10 @@ const Row = ({
       let className = 'td' + property // set className = 'tdname' for css selector
       let element = line[property]
       if (className === 'tdid') id = element
-      if (className === 'tdtype1' || className === 'tdtype2')
-        className += element // tdtype1/tdtype2 also have value like: tdtype1fire
+      //if (className === 'tdtype1' || className === 'tdtype2')
+      //  className += element // tdtype1/tdtype2 also have value like: tdtype1fire
       trColumns.push(
-        <td className={className} key={property} tag={id} row={row}>
+        <td className={className} key={property} data-tag={id} data-row={row}>
           {element}
         </td>
       )
@@ -88,7 +107,7 @@ const Row = ({
   let trClassName = 'DataRow'
   if (row === numActiveRow) trClassName += '0'
 
-  let trRow = []
+  let trRow:any = []
   trRow.push(
     <tr
       className={trClassName}
@@ -102,7 +121,15 @@ const Row = ({
   return trRow
 }
 
-const ModalInfo = Props => {
+interface IModalInfoProps {
+  arrData: IMySearchState['itemsView'],
+  isModalInfo: boolean,
+  idClicked:IMySearchState['idDetailed'],
+  closeModalInfo: any,
+  getColumnName: any
+}
+
+const ModalInfo = (Props: IModalInfoProps) => {
   const {
     arrData,
     isModalInfo,
@@ -145,9 +172,9 @@ const ModalInfo = Props => {
                 key={0}
                 data={arrDataModal[0]}
                 skipEvents={true}
-                getColumnName={getColumnName}
+                getColumnName={getColumnName}                
                 row={0}
-                numActiveRow={-1}
+                numActiveRow={-1}                
               />
             </tbody>
           </table>
@@ -159,7 +186,26 @@ const ModalInfo = Props => {
   return divModalInfo
 }
 
-const Table = Props => {
+interface ITableState {
+  isModalInfo: boolean,
+  idClicked:IMySearchState['idDetailed'],
+  numActiveRow:IMySearchState['numActiveRow']
+  maxActiveRow: number,
+  idActiveRow: IMySearchState['idDetailed']  
+}
+
+interface ITableProps {
+  data: IMySearchState['itemsView'],
+  changeSortOrder: any,
+  skipEvents: boolean,
+  sortColumn: IMySearchState['sortColumn'],
+  sortDirection: IMySearchState['sortDirection'],
+  getColumnName: any,
+  changeDetailed?: FuncChangeDetailed,
+  numActiveRow?:IMySearchState['numActiveRow']
+}
+
+const Table = (Props:ITableProps):React.ReactElement => {
   //const { myStore } = useStores()
   const arrData = Props.data
   const changeSortOrder = Props.changeSortOrder // Callback for changeSortOrder
@@ -176,19 +222,19 @@ const Table = Props => {
 
   // console.log('Table props:arrData',arrData.length);
 
-  const [state, _setState] = useState({
+  const [state, _setState] = useState<ITableState>({
     isModalInfo: false,
     idClicked: -1,
-    numActiveRow: setActiveRow,
+    numActiveRow: setActiveRow === undefined ? -1: setActiveRow,
     maxActiveRow: arrData.length,
-    idActiveRow: null
+    idActiveRow: -1
   })
 
   // define a ref, for use inside event Listener !
   const actualStateRef = useRef(state)
 
   // in place of original `setState`
-  const setState = x => {
+  const setState = (x:any) => {
     actualStateRef.current = x // keep updated
     _setState(x)
   }
@@ -210,7 +256,7 @@ const Table = Props => {
       numActiveRow: setActiveRow
     })
   }
-  const UpdateIdActiveRow = (numActiveRow, idActiveRow) => {
+  const UpdateIdActiveRow = (numActiveRow:IMySearchState['numActiveRow'], idActiveRow:number | null) => {
     let newIdActiveRow = null
     arrData.forEach((item, index) => {
       if (numActiveRow === index) newIdActiveRow = item.id
@@ -231,7 +277,7 @@ const Table = Props => {
     }
   }, [])
 
-  const keyboardTable = event => {
+  const keyboardTable = (event:any) => {
     const {
       numActiveRow,
       maxActiveRow,
@@ -241,7 +287,7 @@ const Table = Props => {
     // console.log('Key - Pressed:', event.keyCode)
     //console.log('keyboardTable maxActiveRow', maxActiveRow, 'numActiveRow', numActiveRow)
 
-    let newActiveRow = numActiveRow
+    let newActiveRow = typeof numActiveRow === 'number' ? numActiveRow : parseInt(numActiveRow)
     let isNavigateKey = false
     if (event.keyCode === 40) {
       // KeyDown
@@ -270,7 +316,7 @@ const Table = Props => {
     // 120 F9
     if (event.keyCode === 27) {
       // esc is pressed
-      if (isModalInfo) closeModalInfo()
+      if (isModalInfo) closeModalInfo(null)
     }
 
     if (
@@ -287,23 +333,25 @@ const Table = Props => {
     if (event.keyCode === 120) {
       // F9
       //console.log('F9 on#', idActiveRow, typeof idActiveRow)
-      changeDetailed(idActiveRow, numActiveRow)
+      if(changeDetailed !== undefined)
+        changeDetailed(idActiveRow, numActiveRow)
     }
   }
 
-  const dblClickOnDataRow = event => {
+  const dblClickOnDataRow = (event:any) => {
     const { isModalInfo } = actualStateRef.current
     if (!isModalInfo) {
-      let idActiveRow = parseInt(event.target.getAttribute('tag'))
-      changeDetailed(idActiveRow, numActiveRow)
+      let idActiveRow = parseInt(event.target.getAttribute('data-tag'))
+      if(changeDetailed !== undefined)
+        changeDetailed(idActiveRow, numActiveRow)
     }
   }
 
-  const clickOnDataRow = event => {
+  const clickOnDataRow = (event:any) => {
     const { isModalInfo, idActiveRow } = actualStateRef.current
     if (!isModalInfo) {
-      let idClicked = parseInt(event.target.getAttribute('tag'))
-      let numActiveRow = parseInt(event.target.getAttribute('row'))
+      let idClicked = parseInt(event.target.getAttribute('data-tag'))
+      let numActiveRow = parseInt(event.target.getAttribute('data-row'))
       // console.log('clickOnDataRow: idClicked',idClicked);
       if (idClicked === idActiveRow)
         setState({
@@ -322,7 +370,7 @@ const Table = Props => {
     }
   }
 
-  const closeModalInfo = event => {
+  const closeModalInfo = (event:any) => {
     // change state force component re-render
     setState({ ...actualStateRef.current, isModalInfo: false })
   }

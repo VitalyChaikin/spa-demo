@@ -5,11 +5,11 @@ import MyDetailed from './MyDetailed'
 import { useHistory } from 'react-router'
 // import { useRouteMatch } from 'react-router'
 
-const getColumnName = propName => {
+const getColumnName = (propName:string):string => {
   return getAllColumnNames()[propName]
 }
 
-const getAllColumnNames = () => {
+const getAllColumnNames = ():{[key:string]: string} => {
   return {
     id: '#',
     type: 'Ресурс',
@@ -21,11 +21,11 @@ const getAllColumnNames = () => {
 }
 
 // console.log('decode64', decodeURIComponent(escape(window.atob(searchData64))));
-const getSearchDataFromPath = (sToken, needDecode = true) => {
-  const curPath = window.location.pathname
-  let result = ''
+const getSearchDataFromPath = (sToken:string, needDecode:boolean = true):string => {
+  const curPath:string = window.location.pathname
+  let result:string = ''
   if (curPath !== '/search') {
-    let searchData64, n
+    let searchData64:string, n:number
     n = curPath.indexOf(sToken)
     if (n !== -1) {
       searchData64 = curPath.substring(n + sToken.length)
@@ -42,14 +42,31 @@ const getSearchDataFromPath = (sToken, needDecode = true) => {
   return result
 }
 
-const MySearch = () => {
-  const inputSearchData = useRef(null)
-  const inputSearchType = useRef(null)
+export type FuncChangeDetailed = (idClicked?:IMySearchState['idDetailed'], 
+                               numActiveRow?:IMySearchState['numActiveRow']) => void
+
+export interface IMySearchState {
+  error: any,
+  isLoaded: boolean,
+  items: Array<any>,
+  itemsView: Array<any>,
+  sortColumn: string | undefined, // Current sort column
+  sortDirection: number, // Sort direction 1/-1
+  searchData: string,
+  searchType: string,
+  isDetailed: boolean, // is Detailed component active ?
+  idDetailed: number,  // id = items.id
+  numActiveRow: number|string // <- this pass to Table component 0/''
+}
+
+const MySearch = ():React.ReactElement => {
+  const inputSearchData:any = useRef<HTMLElement>(null)
+  const inputSearchType:any = useRef<HTMLElement>(null)
   const { push } = useHistory()
   //const { path } = useRouteMatch()
   //const { myStore } = useStores()
 
-  const [state, _setState] = useState({
+  const [state, _setState] = useState<IMySearchState>({
     error: null,
     isLoaded: false,
     items: [],
@@ -59,13 +76,13 @@ const MySearch = () => {
     searchData: '',
     searchType: 'все',
     isDetailed: false, // is Detailed component active ?
-    idDetailed: 0, // id = items.id
-    numActiveRow: 0 // <- this pass to Table component
+    idDetailed: 0,     // id = items.id
+    numActiveRow: 0    // <- this pass to Table component
   })
 
-  const actualStateRef = useRef(state)
+  const actualStateRef = useRef<IMySearchState>(state)
   // in place of original `setState`
-  const setState = x => {
+  const setState = (x:any) => {
     actualStateRef.current = x // keep updated
     _setState(x)
   }
@@ -83,16 +100,17 @@ const MySearch = () => {
 
   useEffect(() => {
     const { isLoaded, items, searchData, searchType } = state
-    // console.log('useEffect path=', window.location.pathname)
+    //console.log('useEffect path=', window.location.pathname, isLoaded)
+    //console.log('isDetailed = ', isDetailed)
 
-    const newSearchData = getSearchDataFromPath('s:')
+    const newSearchData:string = getSearchDataFromPath('s:')
     // console.log('newSearchData', newSearchData, 'searchData', searchData)
 
-    const newSearchType = getSearchDataFromPath('t:')
+    const newSearchType:string = getSearchDataFromPath('t:')
     // console.log('newSearchType', newSearchType, 'searchType', searchType)
     // console.log('isLoaded', isLoaded)
 
-    let newNumActiveRow = getSearchDataFromPath('a:', false)
+    let newNumActiveRow:string|number = getSearchDataFromPath('a:', false)
 
     if (newNumActiveRow !== '') {
       newNumActiveRow = parseInt(newNumActiveRow)
@@ -104,6 +122,7 @@ const MySearch = () => {
         .then(res => res.json())
         .then(
           result => {
+            //console.log('fetch data')
             setState({
               ...actualStateRef.current,
               isLoaded: true,
@@ -130,12 +149,13 @@ const MySearch = () => {
         )
     else {
       // Component loaded
+      //console.log('Component allready loaded')
       if (
         searchData !== newSearchData ||
         searchType !== newSearchType ||
         numActiveRow !== newNumActiveRow
       ) {
-        //console.log('Search criteria/numActiveRow changed', 'isLoaded', isLoaded)
+        console.log('Search criteria/numActiveRow changed', 'isLoaded', isLoaded)
         // Search criteria changed
         setState({
           ...actualStateRef.current,
@@ -148,7 +168,7 @@ const MySearch = () => {
     }
   })
 
-  const changeFilter = event => {
+  const changeFilter = (event:any) => {
     console.log('changeFilter')
     // setState({
     //   ...actualStateRef.current,
@@ -156,7 +176,7 @@ const MySearch = () => {
     // });
   }
 
-  const changeSearchType = event => {
+  const changeSearchType = (event:any) => {
     console.log('changeSearchType')
     // setState({
     //   ...actualStateRef.current,
@@ -164,18 +184,18 @@ const MySearch = () => {
     // });
   }
 
-  const searchClick = event => {
-    const searchDataValue = inputSearchData.current.value
-    const searchTypeValue = inputSearchType.current.value
+  const searchClick = (event:any) => {
+    const searchDataValue:string = inputSearchData.current.value
+    const searchTypeValue:string = inputSearchType.current.value
 
-    let searchURL = ''
-    let searchData64 = searchDataValue.trim()
+    let searchURL:string = ''
+    let searchData64:string = searchDataValue.trim()
     if (searchData64 !== '') {
       searchData64 =
         's:' + window.btoa(unescape(encodeURIComponent(searchDataValue))) + ';'
       searchURL += searchData64
     }
-    let searchType64 = searchTypeValue.trim()
+    let searchType64:string = searchTypeValue.trim()
     if (searchType64 !== '') {
       searchType64 =
         't:' + window.btoa(unescape(encodeURIComponent(searchTypeValue))) + ';'
@@ -189,37 +209,39 @@ const MySearch = () => {
     push('/search' + searchURL)
   }
 
-  const searchClear = event => {
+  const searchClear = (event:any) => {
     // console.log('searchClear')
     inputSearchData.current.value = ''
     inputSearchType.current.value = 'все'
     push('/search')
   }
 
-  const filterItems = (items, newSearchData, newSearchType) => {
+  const filterItems = (items:IMySearchState['items'], 
+                       newSearchData:IMySearchState['searchData'], 
+                       newSearchType:IMySearchState['searchType']) => {
     let filtered = items.filter(value => {
       if (newSearchData === '') return true
       // name price desc
       const newSearchDataLowerCase = newSearchData.toLowerCase()
-      const n1 = value.name.toLowerCase().indexOf(newSearchDataLowerCase)
-      const n2 = value.price.toLowerCase().indexOf(newSearchDataLowerCase)
-      const n3 = value.desc.toLowerCase().indexOf(newSearchDataLowerCase)
+      const n1:number = value.name.toLowerCase().indexOf(newSearchDataLowerCase)
+      const n2:number = value.price.toLowerCase().indexOf(newSearchDataLowerCase)
+      const n3:number = value.desc.toLowerCase().indexOf(newSearchDataLowerCase)
       return n1 !== -1 || n2 !== -1 || n3 !== -1
     })
     filtered = filtered.filter(value => {
       if (newSearchType === '' || newSearchType === 'все') return true
       // type
-      const n1 = value.type.indexOf(newSearchType)
+      const n1:number = value.type.indexOf(newSearchType)
       return n1 !== -1
     })
     return filtered
   }
 
-  const changeSortOrder = event => {
+  const changeSortOrder = (event:any) => {
     // console.log('changeSortOrder', event.target.className)
     // click on Column header
-    let arg1
-    let lenBeforeSpace = event.target.className.indexOf(' ') // Take first className='class1 class2 class3'
+    let arg1:string
+    let lenBeforeSpace:number = event.target.className.indexOf(' ') // Take first className='class1 class2 class3'
     // console.log('event.target.className=(',event.target.className,') lenBeforeSpace= ', lenBeforeSpace, 'this.myP.sortColumn = ', this.myP.sortColumn);
     if (-1 === lenBeforeSpace) arg1 = event.target.className
     else arg1 = event.target.className.slice(0, lenBeforeSpace)
@@ -254,23 +276,25 @@ const MySearch = () => {
     })
   }
 
-  const changeActiveRow = numActiveRow => {
-    setState({
-      ...actualStateRef.current,
-      numActiveRow
-    })
-  }
+  // Not used more
+  // const changeActiveRow = (numActiveRow:IMySearchState['numActiveRow']) => {
+  //   setState({
+  //     ...actualStateRef.current,
+  //     numActiveRow
+  //   })
+  // }
 
-  const changeDetailed = (idClicked, numActiveRow) => {
+    const changeDetailed:FuncChangeDetailed = (idClicked:IMySearchState['idDetailed'] | undefined, 
+                                          numActiveRow:IMySearchState['numActiveRow'] | undefined):void => {
     // const {itemsView: _itemsView} = actualStateRef.current
-    // console.log('changeDetailed _itemsView.length', _itemsView.length)
+    //console.log('changeDetailed isDetailed', isDetailed)
     if (isDetailed === false) {
       // Detailed component hidden
 
       //console.log('changeDetailed numActiveRow', numActiveRow)
 
-      let routeURL = ''
-      let searchData64 = numActiveRow.toString()
+      let routeURL:string = ''
+      let searchData64:string = (numActiveRow === undefined ? '' : numActiveRow.toString())
       if (searchData64 !== '0') {
         searchData64 = 'a:' + searchData64 + ';'
         routeURL += searchData64
@@ -280,8 +304,8 @@ const MySearch = () => {
 
       // console.log('searchData64', searchData64);
       // console.log('decode64', decodeURIComponent(escape(window.atob(searchData64))));
-      let curPath = window.location.pathname
-      const nA = curPath.indexOf('/a:')
+      let curPath:string = window.location.pathname
+      const nA:number = curPath.indexOf('/a:')
       if (nA !== -1) curPath = curPath.slice(0, nA)
 
       push(curPath + routeURL)
@@ -296,19 +320,18 @@ const MySearch = () => {
     } else {
       // Detailed component visible
       // numActiveRow - saved before and have actual value
-
-      let curPath = window.location.pathname
-      const nA = curPath.indexOf('/a:')
-      if (nA !== -1) curPath = curPath.slice(0, nA)
-
-      push(curPath)
-
+      const newIsDetailed:boolean = !isDetailed
       setState({
         ...actualStateRef.current,
-        isDetailed: !isDetailed
+        isDetailed: newIsDetailed
         //idDetailed: idClicked,
         //numActiveRow
       })
+
+      // let curPath:string = window.location.pathname
+      // const nA:number = curPath.indexOf('/a:')
+      // if (nA !== -1) curPath = curPath.slice(0, nA)
+      // push(curPath)
     }
   }
   // {isDetailed &&
@@ -381,13 +404,12 @@ const MySearch = () => {
             sortDirection={sortDirection}
             getColumnName={getColumnName}
             changeDetailed={changeDetailed}
-            numActiveRow={numActiveRow}
-            changeActiveRow={changeActiveRow}
+            numActiveRow={numActiveRow}            
           />
         </div>
       </div>
     )
-  if (isDetailed)
+  else // (isDetailed)
     return (
       <div className='MyDetailedF9'>
         <MyDetailed

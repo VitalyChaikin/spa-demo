@@ -2,12 +2,17 @@ import React, { useState, useEffect } from 'react'
 // import { useStores } from '../hooks/use-stores'
 import { Switch, Route, Link, useRouteMatch, useParams } from 'react-router-dom'
 
-const MyList = () => {
+export interface IMyListState {
+  error: any,
+  isLoaded: boolean,
+  items: Array<any>
+}
+const MyList = ():React.ReactElement => {
   let { path } = useRouteMatch()
   //let { topicId } = useParams();
 
   //const { myStore } = useStores()
-  const [state, setState] = useState({
+  const [state, setState] = useState<IMyListState>({
     error: null,
     isLoaded: false,
     items: []
@@ -21,6 +26,7 @@ const MyList = () => {
         .then(
           result => {
             setState({
+              error: null,
               isLoaded: true,
               items: result.items
             })
@@ -29,20 +35,21 @@ const MyList = () => {
           // чтобы не перехватывать исключения из ошибок в самих компонентах.
           error => {
             setState({
-              isLoaded: true,
-              error
+              error,
+              isLoaded: true,              
+              items: []
             })
           }
         )
   })
   const { error, isLoaded, items } = state
 
-  let thList = []
+  let thList:Array<any> = []
   if (error) {
     console.log('error.message', error.message)
     thList.push(<div key='lLoading'>Ошибка: {error.message}</div>)
   } else if (!isLoaded) {
-    console.log('Загрузка')
+    // console.log('Загрузка')
     thList.push(<div key='lLoading'>Загрузка данных ...</div>)
   } else {
     items.map(item =>
@@ -88,31 +95,34 @@ const MyList = () => {
   return <div className='MyList'>{thList}</div>
 }
 
-function buildTopicId (cID) {
+function buildTopicId (cID:string):string {
   return 'item' + cID
 }
 
-function Topic (props) {
+interface IuseParams {
+  topicId: string
+}
+function Topic (props:Pick<IMyListState,'items'>):React.ReactElement {
   // The <Route> that rendered this component has a
   // path of `/topics/:topicId`. The `:topicId` portion
   // of the URL indicates a placeholder that we can
   // get from `useParams()`.
-  let { topicId } = useParams()
+  let { topicId } = useParams<IuseParams>()
   // console.log('Topic() topicId', topicId);
   //let params = useParams();
   // console.log('Topic() params', params);
   const items = props.items
-  let selectedItem = items.find(
+  let selectedItem:any = items.find(
     item => buildTopicId(item.id.toString()) === topicId
   )
   // console.log("selectedItem",selectedItem)
-  let formatedText = []
-  let plainText = selectedItem.desc
-  let n = plainText.indexOf(';')
-  let key = 0
+  let formatedText:Array<any> = []
+  let plainText:string = selectedItem.desc
+  let n:number = plainText.indexOf(';')
+  let key:number = 0
   while (n !== -1) {
     key++
-    let leftText = plainText.substring(0, n)
+    let leftText:string = plainText.substring(0, n)
     formatedText.push(
       <span key={key}>
         {leftText}

@@ -3,14 +3,22 @@ import { Link, Route, Switch, useRouteMatch, useParams } from 'react-router-dom'
 // import { useStores } from '../hooks/use-stores'
 import Table from './Table'
 
-const getSelectedFromPath = cPath => {
+const getSelectedFromPath = (cPath:string):string => {
   let result = cPath.replace('/files', '').replace('/', '')
   return result
 }
-const Node = props => {
+
+interface INodeProps {
+  node: INode,
+  subNode: INode['nested'],
+  items: IMyFilesState['items'],
+  setState: React.SetStateAction<any>
+}
+
+const Node = (props:INodeProps) => {
   const { node, subNode, items, setState } = props
-  let childnodes = null
-  let expanded = false
+  let childnodes:any = null
+  let expanded:INode['expanded'] = false
 
   // the Node component calls itself if there are children
   if (subNode) {
@@ -19,8 +27,8 @@ const Node = props => {
       return (
         <Node
           key={childnode.id}
-          node={childnode}
-          subNode={childnode.nested}
+          node={childnode as INode}
+          subNode={(childnode as INode).nested }
           items={items}
           setState={setState}
         />
@@ -28,9 +36,9 @@ const Node = props => {
     })
   }
 
-  const expandList = event => {
-    const topicId = parseInt(event.target.getAttribute('tag'))
-    const selectedTopicId = parseInt(topicId)
+  const expandList = (event:any) => {
+    const topicId = parseInt(event.target.getAttribute('data-tag'))
+    const selectedTopicId = topicId
     //console.log('expandList: topicId', topicId, typeof topicId);
     //let params = useParams();
     // console.log('Topic() params', params);
@@ -51,7 +59,7 @@ const Node = props => {
   return (
     <li key={node.id}>
       <Link to={'/files/' + node.id}>
-        <span tag={node.id} onClick={expandList}>
+        <span data-tag={node.id} onClick={expandList}>
           {node.name}
         </span>
       </Link>
@@ -59,6 +67,24 @@ const Node = props => {
     </li>
   )
 }
+
+interface INodeLeaf {
+  id: number,
+  name: string
+}
+
+interface INode {
+  id: number,
+  name: string,
+  expanded: boolean,
+  nested: Array<INodeLeaf | INode>
+}
+
+interface IMyFilesState {
+  loaded: boolean,
+  items: Array<INode>
+}
+
 const MyFiles = () => {
   //const { myStore } = useStores()
   let { path } = useRouteMatch()
@@ -66,7 +92,7 @@ const MyFiles = () => {
   // console.log('path', path)
 
   const [currentLink, setLink] = useState(window.location.pathname) // "/files/1"
-  const [state, setState] = useState({
+  const [state, setState] = useState<IMyFilesState>({
     loaded: false,
     // nested id = parentId * 10 +(1..9)
     items: [
@@ -120,7 +146,7 @@ const MyFiles = () => {
   })
 
   const { loaded, items } = state
-  const { currentLnk } = currentLink
+  //const { currentLnk } = currentLink
   //console.log('component: loaded', loaded)
 
   useEffect(() => {
@@ -129,11 +155,11 @@ const MyFiles = () => {
       const currentSelectedItem = getSelectedFromPath(window.location.pathname)
       if (currentSelectedItem !== '') {
         // Expand selected item node
-        let selectedTopicId = parseInt(currentSelectedItem)
+        let selectedTopicId:number = parseInt(currentSelectedItem)
         if (selectedTopicId >= 10)
           selectedTopicId = (selectedTopicId - (selectedTopicId % 10)) / 10
 
-        let changed = false
+        let changed:boolean = false
         items.forEach(item => {
           if (item.id === selectedTopicId) {
             // console.log('Switched !', item.expanded, typeof item.expanded)
@@ -150,7 +176,7 @@ const MyFiles = () => {
         }
       }
     }
-  }, [currentLnk])
+  }, [currentLink, items, loaded])
 
   let nodes = items.map(function (item) {
     return (
@@ -197,11 +223,11 @@ const MyFiles = () => {
   )
 }
 
-const getColumnName = propName => {
+const getColumnName = (propName:string):string => {
   return getAllColumnNames()[propName]
 }
 
-const getAllColumnNames = () => {
+const getAllColumnNames = ():{[key:string]: string} => {
   return {
     id: 'hidden', // hidden = dont dysplay this in component
     author: 'Автор',
@@ -209,7 +235,29 @@ const getAllColumnNames = () => {
   }
 }
 
-function Topic1 (props) {
+interface Topic1Props {
+  items: IMyFilesState['items'],
+  setState: React.SetStateAction<any>
+}
+
+interface Topic1State {
+  loaded: boolean,
+  fileId: string | undefined,
+  content: string,
+  itemsView: Array<any>
+}
+
+interface filesdataItem { 
+  id: number, 
+  author: string, 
+  book: string
+}
+
+interface filesdata {
+  items: Array<filesdataItem>
+}
+
+function Topic1 (props:Topic1Props) {
   // The <Route> that rendered this component has a
   // path of `/topics/:topicId`. The `:topicId` portion
   // of the URL indicates a placeholder that we can
@@ -217,7 +265,7 @@ function Topic1 (props) {
   let { topicId } = useParams()
   //console.log('Topic1 topicId = ', topicId)
 
-  const [state, setState] = useState({
+  const [state, setState] = useState<Topic1State>({
     loaded: false,
     fileId: topicId,
     content: '',
@@ -238,8 +286,8 @@ function Topic1 (props) {
 
   useEffect(() => {
     //console.log('Topic1 useEffect fileId', fileId)
-    const fileNameOnServer = 'http://localhost:3000/filedata' + fileId + '.txt'
-    const fileDataOnServer = 'http://localhost:3000/filesdata.txt'
+    const fileNameOnServer:string = 'http://localhost:3000/filedata' + fileId + '.txt'
+    const fileDataOnServer:string = 'http://localhost:3000/filesdata.txt'
     // if(fileId>10 && !loaded) {
     //   fetch(fileNameOnServer).then( response => {
     //     setState({
@@ -249,8 +297,10 @@ function Topic1 (props) {
     //     });
     //   })
     // }
-    if (parseInt(fileId) > 10 && !loaded) {
-      let newItemsView = []
+    let cFileId:number = (fileId === undefined ? -1 : parseInt(fileId))
+
+    if (cFileId > 10 && !loaded) {
+      let newItemsView:Topic1State['itemsView'] = []
       if (itemsView.length === 0)
         fetch(fileDataOnServer)
           .then(response => response.json()) // res.text()
@@ -258,8 +308,8 @@ function Topic1 (props) {
             result => {
               // console.log('success fetch', fileDataOnServer)
               // console.log('result.items', result.items)
-              newItemsView = result.items.filter(
-                item => item.id === parseInt(fileId)
+              newItemsView = (result as filesdata).items.filter(
+                item => item.id === (fileId === undefined ? -1 : parseInt(fileId))
               )
               // setState({
               //   ...state,
@@ -282,8 +332,8 @@ function Topic1 (props) {
         .then(response => response.text()) // res.json()
         .then(
           result => {
-            const ifEmptyHtmlResponse =
-              result.slice(0, 15) === '<!DOCTYPE html>'
+            const ifEmptyHtmlResponse:boolean =
+              (result as string).slice(0, 15) === '<!DOCTYPE html>'
             setState({
               ...state,
               loaded: true,
@@ -299,14 +349,14 @@ function Topic1 (props) {
             console.log('error fetch', fileNameOnServer)
             setState({
               ...state,
-              isLoaded: true,
+              loaded: true,
               content: 'Ошибка загрузки данных из файла: ' + fileNameOnServer,
               itemsView: newItemsView
             })
           }
         )
     }
-  }, [fileId])
+  }, [fileId, itemsView, loaded, state])
 
   const isItemSelected = itemsView.length > 0
 
@@ -319,8 +369,7 @@ function Topic1 (props) {
           changeSortOrder={null}
           sortColumn=''
           sortDirection={1}
-          getColumnName={getColumnName}
-          clickOnDataRow={null}
+          getColumnName={getColumnName}          
         />
       ) : null}
       <div className='FilesRightContentText'>
