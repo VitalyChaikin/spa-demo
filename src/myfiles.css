@@ -1,0 +1,36 @@
+.MyFiles {
+  flex: 1;
+  display: flex; }
+
+.MyFilesLeftPanel,
+.MyFilesRightPanel {
+  margin-left: 1em;
+  text-align: left; }
+
+.MyFilesLeftPanel {
+  flex-direction: column;
+  text-align: left; }
+
+.FilesRightContent {
+  text-align: left;
+  font-size: larger;
+  font-style: italic;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+.FilesRightContentText {
+  margin-left: 0.5em; }
+
+.author,
+.book {
+  text-align: center; }
+
+.tdauthor {
+  text-align: center;
+  width: 8em; }
+
+.tdbook {
+  text-align: center;
+  width: 17em; }
+
+#activeItemFiles {
+  background-color: yellow; }

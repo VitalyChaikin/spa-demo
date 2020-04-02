@@ -11,16 +11,18 @@ import Footer from './components/Footer'
 function App () {
   return (
     <BrowserRouter>
-      <div className='App'>
-        <div className='mainFrame'>
-          <Header />
-          <div className='NavWorkarea'>
-            <NavPanel />
-            <Workarea />
+      <main>
+        <div className='App'>
+          <div className='mainFrame'>
+            <Header />
+            <div className='NavWorkarea'>
+              <NavPanel />
+              <Workarea />
+            </div>
+            <Footer />
           </div>
-          <Footer />
         </div>
-      </div>
+      </main>
     </BrowserRouter>
   )
 }

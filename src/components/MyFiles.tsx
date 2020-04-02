@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { Link, Route, Switch, useRouteMatch, useParams } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from 'react'
+import { Link, Route, Switch, useRouteMatch, useParams, useHistory } from 'react-router-dom'
 // import { useStores } from '../hooks/use-stores'
 import Table from './Table'
 
@@ -11,12 +11,13 @@ const getSelectedFromPath = (cPath:string):string => {
 interface INodeProps {
   node: INode,
   subNode: INode['nested'],
+  activeItem: IMyFilesState['activeItem']
   items: IMyFilesState['items'],
-  setState: React.SetStateAction<any>
+  expandItem: any
 }
 
 const Node = (props:INodeProps) => {
-  const { node, subNode, items, setState } = props
+  const { node, subNode, items, activeItem, expandItem } = props
   let childnodes:any = null
   let expanded:INode['expanded'] = false
 
@@ -29,29 +30,17 @@ const Node = (props:INodeProps) => {
           key={childnode.id}
           node={childnode as INode}
           subNode={(childnode as INode).nested }
+          activeItem={activeItem}
           items={items}
-          setState={setState}
+          expandItem={expandItem}
         />
       )
     })
   }
 
   const expandList = (event:any) => {
-    const topicId = parseInt(event.target.getAttribute('data-tag'))
-    const selectedTopicId = topicId
-    //console.log('expandList: topicId', topicId, typeof topicId);
-    //let params = useParams();
-    // console.log('Topic() params', params);
-
-    items.forEach(item => {
-      if (item.id === selectedTopicId) {
-        // console.log('Switched !', item.expanded, typeof item.expanded)
-        if (item.expanded !== undefined)
-          // for files in root
-          item.expanded = !item.expanded
-      }
-    })
-    setState({ loaded: true, items: items })
+    const selectedTopicId = parseInt(event.target.getAttribute('data-tag'))
+    expandItem(selectedTopicId)    
   }
 
   // return our list element
@@ -59,7 +48,7 @@ const Node = (props:INodeProps) => {
   return (
     <li key={node.id}>
       <Link to={'/files/' + node.id}>
-        <span data-tag={node.id} onClick={expandList}>
+        <span data-tag={node.id} onClick={expandList} id={node.id === activeItem ? 'activeItemFiles' : 'passiveItemFiles'}>
           {node.name}
         </span>
       </Link>
@@ -82,18 +71,21 @@ interface INode {
 
 interface IMyFilesState {
   loaded: boolean,
+  activeItem: number,
   items: Array<INode>
 }
 
 const MyFiles = () => {
   //const { myStore } = useStores()
   let { path } = useRouteMatch()
+  const { push } = useHistory()
   // console.log('window.location.pathname', window.location.pathname)
   // console.log('path', path)
 
   const [currentLink, setLink] = useState(window.location.pathname) // "/files/1"
-  const [state, setState] = useState<IMyFilesState>({
+  const [state, _setState] = useState<IMyFilesState>({
     loaded: false,
+    activeItem: 1,
     // nested id = parentId * 10 +(1..9)
     items: [
       {
@@ -145,24 +137,33 @@ const MyFiles = () => {
     ]
   })
 
-  const { loaded, items } = state
+  // define a ref, for use inside event Listener !
+  const actualStateRef:any = useRef<IMyFilesState>(state)
+
+  // in place of original `setState`
+  const setState = (x:any) => {
+    actualStateRef.current = x // keep updated
+    _setState(x)
+  }
+  const { loaded, activeItem, items } = actualStateRef.current
   //const { currentLnk } = currentLink
   //console.log('component: loaded', loaded)
 
   useEffect(() => {
-    // console.log('useEffect loaded = ', loaded)
+    //console.log('useEffect loaded = ', loaded)
     if (!loaded) {
       const currentSelectedItem = getSelectedFromPath(window.location.pathname)
       if (currentSelectedItem !== '') {
         // Expand selected item node
         let selectedTopicId:number = parseInt(currentSelectedItem)
+        let selectedNodeId:number = selectedTopicId
         if (selectedTopicId >= 10)
-          selectedTopicId = (selectedTopicId - (selectedTopicId % 10)) / 10
+          selectedNodeId = (selectedTopicId - (selectedTopicId % 10)) / 10
 
         let changed:boolean = false
-        items.forEach(item => {
-          if (item.id === selectedTopicId) {
-            // console.log('Switched !', item.expanded, typeof item.expanded)
+        items.forEach( (item:any) => {
+          if (item.id === selectedNodeId) {
+            //console.log('useEffect: Switched !', item.expanded, typeof item.expanded)
             if (item.expanded !== undefined) {
               // for files in root
               item.expanded = true
@@ -170,22 +171,184 @@ const MyFiles = () => {
             }
           }
         })
-        if (changed) {
-          setState({ loaded: true, items: items })
-          // console.log('useEffect state changed !')
+        if (changed) {          
+          setState({ ...actualStateRef.current, loaded: true, activeItem: selectedTopicId, items: items })          
         }
       }
     }
   }, [currentLink, items, loaded])
 
-  let nodes = items.map(function (item) {
+  
+  useEffect(() => {
+    console.log('MyFiles: componentDidMount - addEventListener')
+    // thisComponentRef.current.focus()
+    document.addEventListener('keydown', keyboardMyFiles, false)
+    return () => {
+      console.log('MyFiles: componentWillUnmount - removeEventListener')
+      document.removeEventListener('keydown', keyboardMyFiles, false)
+    }
+  }, [])
+
+  const getNodeByID = (nodeId:INode['id'], fromNested:any = undefined ):INode | undefined => {
+    let { items } = actualStateRef.current
+    if(fromNested !== undefined) items = fromNested
+
+    let node:INode | undefined = undefined
+    // id nested.id
+    items.forEach( (item:any) => {
+      if(node === undefined) {
+        if(item.id === nodeId) 
+          node = item
+        else 
+          if(item.nested !== undefined) node = getNodeByID(nodeId, item.nested)
+      }      
+    });
+    return node
+  }
+  const isNodeExpanded = (nodeId:INode['id'] ):INode['expanded'] => {    
+    const node:INode | undefined = getNodeByID(nodeId)
+    //console.log('isNodeExpanded : nodeId', nodeId, node)
+    //console.log('isNodeExpanded : node.expanded', (node as INode).expanded)
+    let result:boolean = false
+    if(node !== undefined && node.expanded !== undefined) {
+      result = (node as INode).expanded
+      //console.log('isNodeExpanded : result', result)
+    }
+    return result
+  }
+
+  const tryChangeActiveItem = (newActiveItem:INode['id'], direction:number):INode['id'] => {
+    //console.log('tryChangeActiveItem', newActiveItem, direction)
+    if(getNodeByID(newActiveItem + direction) !== undefined) {
+      //console.log('ChangeActiveItem to:', newActiveItem + direction)
+      return newActiveItem + direction
+    }
+    const parentItemId = getParentItemId(newActiveItem)
+    //console.log('parentItemId:', parentItemId)
+    if(parentItemId === 0) 
+      return newActiveItem  // out of bounds
+
+    if(direction === 1) {
+      if(getNodeByID(parentItemId + direction) !== undefined) 
+        return parentItemId + direction
+      else 
+        return newActiveItem
+    } else // direction === -1
+        return parentItemId
+  }
+
+  const getParentItemId = (nodeId:INode['id']):INode['id'] => {
+    // parentId = целая часть от деления на 10;  
+    return (nodeId - nodeId % 10) / 10
+  }
+
+  const getLastNested = (nodeId:INode['id']):INode['id'] => {
+    let node = getNodeByID(nodeId)  // always INode never undefined
+    const maxNested = (node as INode).nested.length - 1
+    const lastNested = (node as INode).nested[maxNested]    
+    return lastNested.id
+  }
+  
+  const updateActiveItem = ( newActiveItem:IMyFilesState['activeItem'] ):void => {    
+    setState({ ...actualStateRef.current, activeItem: newActiveItem })    
+  }
+
+  // <Link to={'/files/' + node.id}>
+  const navigateActiveItem = (event:any | null):void => {
+    const { activeItem } = actualStateRef.current    
+    push('/files/' + activeItem.toString())    
+  }
+  //</Link>
+  const expandItem = (selectedTopicId:IMyFilesState['activeItem']):void => {
+    const { items } = actualStateRef.current
+
+    items.forEach( (item:any) => {
+      if (item.id === selectedTopicId) {
+        //console.log('Switched !', item.expanded, typeof item.expanded)
+        if (item.expanded !== undefined) {
+          // for files in root
+          item.expanded = !item.expanded
+          //console.log('Changed !', item.expanded, typeof item.expanded)
+        }
+      }
+    })
+    
+    setState({ ...actualStateRef.current, activeItem: selectedTopicId, items: items })    
+  }
+  const keyboardMyFiles = (event:any) => {
+    let { activeItem: newActiveItem } = actualStateRef.current
+    // const { items } = actualStateRef.current
+    let navActiveItem:INode['id'] = 0
+
+    let isNavigateKey = false
+    if (event.keyCode === 40) {
+      // console.log('KeyDown')      
+      isNavigateKey = true
+      if(isNodeExpanded(newActiveItem)) newActiveItem = (getNodeByID(newActiveItem) as INode).nested[0].id
+        else {
+          navActiveItem = tryChangeActiveItem(newActiveItem, +1)
+          //console.log('(+1) navActiveItem = ', navActiveItem, newActiveItem)
+          if(navActiveItem !== newActiveItem)  // success MoveDOWN
+            newActiveItem = navActiveItem
+        }
+    }
+    if (event.keyCode === 38) {
+      //console.log('KeyUp')
+      isNavigateKey = true
+      navActiveItem = tryChangeActiveItem(newActiveItem, -1)
+      //console.log('KeyUp: ', navActiveItem)
+      if(navActiveItem !== newActiveItem) { // success MoveUP
+        //console.log('KeyUp: navActiveItem - newActiveItem = ',navActiveItem - newActiveItem)
+        if(navActiveItem - newActiveItem === -1)  // move up and node Level dont change:
+          while(isNodeExpanded(navActiveItem))    // then if node expanded, move to getLastNested()
+            navActiveItem = getLastNested(navActiveItem)  // continue until find not-expanded nested item
+      }
+      newActiveItem = navActiveItem
+    }
+
+    let isOutofBounds = false // Allready checked by tryChangeActiveItem(newActiveItem, +/- 1)
+    // if (newActiveItem <= 0) isOutofBounds = true
+    // if (newActiveItem > items.length) isOutofBounds = true
+    
+    if (isNavigateKey && !isOutofBounds) {      
+      // console.log('keyboardTable setState', 'newActiveItem', newActiveItem)
+      event.preventDefault()
+      event.stopPropagation()
+      updateActiveItem(newActiveItem)      
+    }
+
+    // Enter || Arrow_Right
+    if (event.keyCode === 13 || event.keyCode === 39) {      
+      event.preventDefault()
+      event.stopPropagation()
+      expandItem(newActiveItem)
+      navigateActiveItem(null)
+      // console.log('newActiveItem =', newActiveItem)
+      // console.log('items[newActiveItem] =', items[newActiveItem])
+      // console.log('items[newActiveItem].id =', items[newActiveItem].id)      
+    }
+
+    // ESC || Arrow_Left
+    if (event.keyCode === 27 || event.keyCode === 37) {
+      event.preventDefault()
+      event.stopPropagation()
+      push('/')
+    }
+    //console.log(event.keyCode)
+  }
+
+
+  
+
+  let nodes = items.map(function (item:any) {
     return (
       <Node
         key={item.id}
         node={item}
         subNode={item.nested}
+        activeItem={activeItem}
         items={items}
-        setState={setState}
+        expandItem={expandItem}
       />
     )
   })
@@ -265,7 +428,7 @@ function Topic1 (props:Topic1Props) {
   let { topicId } = useParams()
   //console.log('Topic1 topicId = ', topicId)
 
-  const [state, setState] = useState<Topic1State>({
+  const [state, setTopicState] = useState<Topic1State>({
     loaded: false,
     fileId: topicId,
     content: '',
@@ -276,7 +439,7 @@ function Topic1 (props:Topic1Props) {
 
   if (topicId !== fileId) {
     //console.log('Topic1 fileId = ', fileId, ' need change state !')
-    setState({
+    setTopicState({
       loaded: false,
       fileId: topicId,
       content: '',
@@ -285,18 +448,10 @@ function Topic1 (props:Topic1Props) {
   }
 
   useEffect(() => {
-    //console.log('Topic1 useEffect fileId', fileId)
+    //console.log('Topic1 useEffect fileId', fileId)    
     const fileNameOnServer:string = 'http://localhost:3000/filedata' + fileId + '.txt'
     const fileDataOnServer:string = 'http://localhost:3000/filesdata.txt'
-    // if(fileId>10 && !loaded) {
-    //   fetch(fileNameOnServer).then( response => {
-    //     setState({
-    //       ...state,
-    //       loaded: true,
-    //       content: response.text()
-    //     });
-    //   })
-    // }
+    
     let cFileId:number = (fileId === undefined ? -1 : parseInt(fileId))
 
     if (cFileId > 10 && !loaded) {
@@ -310,17 +465,13 @@ function Topic1 (props:Topic1Props) {
               // console.log('result.items', result.items)
               newItemsView = (result as filesdata).items.filter(
                 item => item.id === (fileId === undefined ? -1 : parseInt(fileId))
-              )
-              // setState({
-              //   ...state,
-              //   itemsView : result.items
-              // });
+              )              
             },
             // Примечание: важно обрабатывать ошибки именно здесь, а не в блоке catch(),
             // чтобы не перехватывать исключения из ошибок в самих компонентах.
             error => {
               console.log('error fetch', fileDataOnServer)
-              setState({
+              setTopicState({
                 ...state,
                 itemsView: []
               })
@@ -334,7 +485,7 @@ function Topic1 (props:Topic1Props) {
           result => {
             const ifEmptyHtmlResponse:boolean =
               (result as string).slice(0, 15) === '<!DOCTYPE html>'
-            setState({
+            setTopicState({
               ...state,
               loaded: true,
               content: ifEmptyHtmlResponse
@@ -347,7 +498,7 @@ function Topic1 (props:Topic1Props) {
           // чтобы не перехватывать исключения из ошибок в самих компонентах.
           error => {
             console.log('error fetch', fileNameOnServer)
-            setState({
+            setTopicState({
               ...state,
               loaded: true,
               content: 'Ошибка загрузки данных из файла: ' + fileNameOnServer,

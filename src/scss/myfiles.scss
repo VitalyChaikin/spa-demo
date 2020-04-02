@@ -42,3 +42,9 @@
 .tdbook {
   @include stdColumnStyle(17em);
 }
+
+#activeItemFiles {
+  background-color: yellow;
+  // border-left: 3px solid blueviolet;
+  // border-right: 10px solid blueviolet;  
+}

@@ -231,7 +231,7 @@ const Table = (Props:ITableProps):React.ReactElement => {
   })
 
   // define a ref, for use inside event Listener !
-  const actualStateRef = useRef(state)
+  const actualStateRef:any = useRef<ITableState>(state)
 
   // in place of original `setState`
   const setState = (x:any) => {
@@ -239,7 +239,7 @@ const Table = (Props:ITableProps):React.ReactElement => {
     _setState(x)
   }
 
-  const {
+  const {    
     isModalInfo,
     idClicked,
     numActiveRow,
@@ -269,11 +269,15 @@ const Table = (Props:ITableProps):React.ReactElement => {
   UpdateIdActiveRow(numActiveRow, idActiveRow)
 
   useEffect(() => {
-    // console.log('componentDidMount')
-    document.addEventListener('keydown', keyboardTable, false)
+    console.log('Table: componentDidMount')    
+    // console.log('Table: skipEvents', skipEvents)
+
+    if(!skipEvents)
+      document.addEventListener('keydown', keyboardTable, false)
     return () => {
-      // console.log('componentWillUnmount')
-      document.removeEventListener('keydown', keyboardTable, false)
+      console.log('Table: componentWillUnmount')
+      if(!skipEvents)
+        document.removeEventListener('keydown', keyboardTable, false)
     }
   }, [])
 
@@ -306,6 +310,8 @@ const Table = (Props:ITableProps):React.ReactElement => {
     //console.log('keyboardTable maxActiveRow', maxActiveRow, 'numActiveRow', numActiveRow)
 
     if (isNavigateKey && !isOutofBounds) {
+      event.preventDefault()
+      event.stopPropagation()
       // changeActiveRow(newActiveRow)
       //console.log('keyboardTable setState', 'newActiveRow', newActiveRow)
       setState({ ...actualStateRef.current, numActiveRow: newActiveRow })
@@ -316,6 +322,8 @@ const Table = (Props:ITableProps):React.ReactElement => {
     // 120 F9
     if (event.keyCode === 27) {
       // esc is pressed
+      event.preventDefault()
+      event.stopPropagation()
       if (isModalInfo) closeModalInfo(null)
     }
 
@@ -324,6 +332,8 @@ const Table = (Props:ITableProps):React.ReactElement => {
       event.keyCode === 115
     ) {
       // F4
+      event.preventDefault()
+      event.stopPropagation()
       let idClicked = idActiveRow
       // console.log('clickOnDataRow: idClicked',idClicked);
       if (idClicked !== null)
@@ -332,6 +342,8 @@ const Table = (Props:ITableProps):React.ReactElement => {
 
     if (event.keyCode === 120) {
       // F9
+      event.preventDefault()
+      event.stopPropagation()
       //console.log('F9 on#', idActiveRow, typeof idActiveRow)
       if(changeDetailed !== undefined)
         changeDetailed(idActiveRow, numActiveRow)
@@ -375,6 +387,7 @@ const Table = (Props:ITableProps):React.ReactElement => {
     setState({ ...actualStateRef.current, isModalInfo: false })
   }
 
+  //console.log('Table: render')
   // <div className={'ActiveRow'+(numActiveRow-i).toString()}></div>
   return (
     <div className='frameDataTable'>

@@ -215,6 +215,11 @@
   margin-left: 0.5em;
   text-align: left; }
 
+#activeItem {
+  background-color: yellow;
+  border-left: 10px solid blueviolet;
+  border-right: 10px solid blueviolet; }
+
 .ulMyList-li-2line {
   font-size: smaller;
   font-style: italic; }
@@ -236,7 +241,8 @@
   box-shadow: 2px -2px 5px 0 rgba(0, 0, 0, 0.1), -2px -2px 5px 0 rgba(0, 0, 0, 0.1), 2px 2px 5px 0 rgba(0, 0, 0, 0.1), -2px 2px 5px 0 rgba(0, 0, 0, 0.1);
   font-size: 20px;
   letter-spacing: 2px;
-  transition: 0.3s all linear; }
+  transition: 0.3s all linear;
+  cursor: pointer; }
 
 .ulMyList li:nth-child(2),
 .ulNavPanel li:nth-child(2) {
@@ -315,6 +321,9 @@
 .tdbook {
   text-align: center;
   width: 17em; }
+
+#activeItemFiles {
+  background-color: yellow; }
 
 .MyDetailed {
   text-align: left; }
