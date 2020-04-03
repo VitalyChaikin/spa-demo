@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 // import { useStores } from '../hooks/use-stores'
-import {IMySearchState, FuncChangeDetailed} from './MySearch'
+import { IMySearchState, FuncChangeDetailed } from './MySearch'
+import { IParentListener, isKbdEventActive, setFocusOn1st, isParentListenerFocused } from '../api/kbdBridge'
 
 interface IRowHeadProps {
   data: IMySearchState['itemsView'],
@@ -202,7 +203,8 @@ interface ITableProps {
   sortDirection: IMySearchState['sortDirection'],
   getColumnName: any,
   changeDetailed?: FuncChangeDetailed,
-  numActiveRow?:IMySearchState['numActiveRow']
+  numActiveRow?:IMySearchState['numActiveRow'],
+  parentKbdListeners?:IParentListener
 }
 
 const Table = (Props:ITableProps):React.ReactElement => {
@@ -215,12 +217,13 @@ const Table = (Props:ITableProps):React.ReactElement => {
   const getColumnName = Props.getColumnName
   const changeDetailed = Props.changeDetailed
   const setActiveRow = Props.numActiveRow
+  const parentKbdListeners = Props.parentKbdListeners
   // const changeActiveRow = Props.changeActiveRow // <-- Передается но не используется
 
   // console.log('Table::setActiveRow', setActiveRow)
   // const clickOnDataRow = Props.clickOnDataRow     // Callback for clickOnDataRow
 
-  // console.log('Table props:arrData',arrData.length);
+  //console.log('Table props:parentKbdListeners',Props.parentKbdListeners);
 
   const [state, _setState] = useState<ITableState>({
     isModalInfo: false,
@@ -288,8 +291,15 @@ const Table = (Props:ITableProps):React.ReactElement => {
       isModalInfo,
       idActiveRow
     } = actualStateRef.current
-    // console.log('Key - Pressed:', event.keyCode)
-    //console.log('keyboardTable maxActiveRow', maxActiveRow, 'numActiveRow', numActiveRow)
+    //console.log('keyboardTable:', event.keyCode)    
+
+    if(parentKbdListeners !== undefined) {
+      if(!isKbdEventActive(event, parentKbdListeners)) {
+        //console.log('Send Key - to parent and event NOT active')
+        return
+      }
+      //console.log('Send Key - to parent and event Active')
+    }
 
     let newActiveRow = typeof numActiveRow === 'number' ? numActiveRow : parseInt(numActiveRow)
     let isNavigateKey = false
@@ -330,7 +340,7 @@ const Table = (Props:ITableProps):React.ReactElement => {
     if (
       event.keyCode === 13 || // Enter
       event.keyCode === 115
-    ) {
+    ) {      
       // F4
       event.preventDefault()
       event.stopPropagation()
@@ -348,6 +358,18 @@ const Table = (Props:ITableProps):React.ReactElement => {
       if(changeDetailed !== undefined)
         changeDetailed(idActiveRow, numActiveRow)
     }
+
+    if (event.keyCode === 37) {
+      // KeyLeft      
+      if(parentKbdListeners !== undefined) {
+        if(!isParentListenerFocused(parentKbdListeners)) {
+          event.preventDefault()
+          event.stopPropagation()
+          setFocusOn1st(parentKbdListeners)
+        }          
+      }
+    }
+
   }
 
   const dblClickOnDataRow = (event:any) => {

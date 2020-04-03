@@ -4,6 +4,7 @@ import MyDetailed from './MyDetailed'
 // import { useStores } from '../hooks/use-stores'
 import { useHistory } from 'react-router'
 // import { useRouteMatch } from 'react-router'
+import { IParentListener } from '../api/kbdBridge'
 
 const getColumnName = (propName:string):string => {
   return getAllColumnNames()[propName]
@@ -284,7 +285,7 @@ const MySearch = ():React.ReactElement => {
   //   })
   // }
 
-    const changeDetailed:FuncChangeDetailed = (idClicked:IMySearchState['idDetailed'] | undefined, 
+  const changeDetailed:FuncChangeDetailed = (idClicked:IMySearchState['idDetailed'] | undefined, 
                                           numActiveRow:IMySearchState['numActiveRow'] | undefined):void => {
     // const {itemsView: _itemsView} = actualStateRef.current
     //console.log('changeDetailed isDetailed', isDetailed)
@@ -334,7 +335,109 @@ const MySearch = ():React.ReactElement => {
       // push(curPath)
     }
   }
-  // {isDetailed &&
+
+  const searchKbd = (event_keyCode:number):boolean => {
+    let kbdEventStillActive:boolean = true
+
+    if(event_keyCode === 38) {
+      //console.log('searchKbd KeyUP !')
+      //document.getElementById('sExpression')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 39) {
+      //console.log('searchKbd KeyRight !')
+      document.getElementById('sExpression')?.blur()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 13 || event_keyCode === 40) {
+      //console.log('searchKbd Enter / KeyDown !')
+      document.getElementById('sType')?.focus()
+      kbdEventStillActive = false
+    }
+
+    return kbdEventStillActive
+  }
+
+  const searchTypeKbd = (event_keyCode:number):boolean => {
+    let kbdEventStillActive:boolean = true
+
+    if(event_keyCode === 38) {
+      //console.log('searchTypeKbd KeyUP !')
+      document.getElementById('sExpression')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 40) {
+      //console.log('searchTypeKbd KeyDown !')
+      document.getElementById('bSearch')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 13) {
+      //console.log('searchClickKbd Enter !')      
+      // document.getElementById('sType')?.toggle()
+      kbdEventStillActive = false
+    }
+
+    return kbdEventStillActive
+  }
+  
+  const searchClickKbd = (event_keyCode:number):boolean => {
+    let kbdEventStillActive:boolean = true
+
+    if(event_keyCode === 38) {
+      //console.log('searchClickKbd KeyUP !')
+      document.getElementById('sType')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 40) {
+      //console.log('searchClickKbd KeyDown !')
+      document.getElementById('bClear')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 13) {
+      //console.log('searchClickKbd Enter !')
+      searchClick(null)
+      kbdEventStillActive = false
+    }
+
+    return kbdEventStillActive
+  }
+  
+  const searchClearKbd = (event_keyCode:number):boolean => {
+    let kbdEventStillActive:boolean = true
+
+    if(event_keyCode === 38) {
+      //console.log('searchClearKbd KeyUP !')
+      document.getElementById('bSearch')?.focus()
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 13) {
+      //console.log('searchClearKbd Enter !')
+      searchClear(null)
+      kbdEventStillActive = false
+    }
+
+    if(event_keyCode === 40) {
+      //console.log('searchClearKbd KeyDown !')
+      document.getElementById('bClear')?.blur()
+      kbdEventStillActive = false
+    }
+
+    return kbdEventStillActive
+  }
+
+  const mySearchKbdListeners:IParentListener = {
+    parentFocusedElementId: ['sExpression', 'sType', 'bSearch', 'bClear'],
+    parentFocusedElementListener: [searchKbd, searchTypeKbd, searchClickKbd, searchClearKbd]
+  }
+  
+  // ======================================== RETURN ===========================================
   if (!isDetailed)
     return (
       <div className='MySearch'>
@@ -349,7 +452,7 @@ const MySearch = ():React.ReactElement => {
               className='input-text'
               id='sExpression'
               defaultValue={searchData}
-              onChange={changeFilter}
+              onChange={changeFilter}              
             />
           </div>
           <div className='hSearchType'>
@@ -360,8 +463,8 @@ const MySearch = ():React.ReactElement => {
               ref={inputSearchType}
               id='sType'
               defaultValue={searchType}
-              onChange={changeSearchType}
-            >
+              onChange={changeSearchType}>
+
               <option value='газ'>газ</option>
               <option value='нефть'>нефть</option>
               <option value='уголь'>уголь</option>
@@ -369,10 +472,10 @@ const MySearch = ():React.ReactElement => {
             </select>
           </div>
           <div className='hButtons'>
-            <button className='bSearch' onClick={searchClick}>
+            <button className='bSearch' id='bSearch' onClick={searchClick}>
               Поиск
             </button>
-            <button className='bClear' onClick={searchClear}>
+            <button className='bClear' id='bClear' onClick={searchClear}>
               Очистить
             </button>
           </div>
@@ -404,7 +507,8 @@ const MySearch = ():React.ReactElement => {
             sortDirection={sortDirection}
             getColumnName={getColumnName}
             changeDetailed={changeDetailed}
-            numActiveRow={numActiveRow}            
+            numActiveRow={numActiveRow}
+            parentKbdListeners={mySearchKbdListeners}
           />
         </div>
       </div>
