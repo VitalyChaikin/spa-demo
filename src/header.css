@@ -2,7 +2,7 @@
 .Footer {
   flex: 1;
   display: flex;
-  align-items: center;  
+  align-items: center;
   font-size: larger;
   background-color: #666699;
   color: #ffffe6;
@@ -12,18 +12,14 @@
   border-color: white;
   flex-wrap: wrap;
   position: sticky;
-
   border: solid;
-  border-color: white;
-}
+  border-color: white; }
 
 .logo {
   position: absolute;
-  margin-left: 1em;
-}
+  margin-left: 1em; }
 
 .logo,
 .info {
   flex: 1;
-  display: block;
-}
+  display: block; }

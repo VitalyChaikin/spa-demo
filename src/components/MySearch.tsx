@@ -5,6 +5,12 @@ import MyDetailed from './MyDetailed'
 import { useHistory } from 'react-router'
 // import { useRouteMatch } from 'react-router'
 import { IParentListener } from '../api/kbdBridge'
+import { Select, Row, Col, Form, Input } from 'antd';
+// import 'antd/lib/select/style/css'
+// import 'antd/lib/row/style/css'
+// import 'antd/lib/col/style/css'
+// import 'antd/lib/form/style/css'
+// import 'antd/lib/input/style/css'
 
 const getColumnName = (propName:string):string => {
   return getAllColumnNames()[propName]
@@ -60,12 +66,31 @@ export interface IMySearchState {
   numActiveRow: number|string // <- this pass to Table component 0/''
 }
 
+interface IMySearchParams {
+  altSearchData: string,
+  altSearchType: string
+}
+
 const MySearch = ():React.ReactElement => {
   const inputSearchData:any = useRef<HTMLElement>(null)
   const inputSearchType:any = useRef<HTMLElement>(null)
   const { push } = useHistory()
   //const { path } = useRouteMatch()
   //const { myStore } = useStores()
+  const isSearchTypeSelectOpen:any = useRef<any>(false)   // variable For html <Select>
+  const isSelectOpen:any = useRef<any>(false)             // final state of <Select> use it for check status
+
+  const [stateSearchParams, _setStateSearchParams] = useState<IMySearchParams>({
+    altSearchData: '',
+    altSearchType: 'все'
+  })
+
+  const actualStateSearchParamsRef = useRef<IMySearchParams>(stateSearchParams)
+  // in place of original `setState`
+  const setStateSearchParams = (x:any) => {
+    actualStateSearchParamsRef.current = x // keep updated
+    _setStateSearchParams(x)
+  }
 
   const [state, _setState] = useState<IMySearchState>({
     error: null,
@@ -80,6 +105,10 @@ const MySearch = ():React.ReactElement => {
     idDetailed: 0,     // id = items.id
     numActiveRow: 0    // <- this pass to Table component
   })
+  const {    
+    altSearchData,
+    altSearchType    
+  } = stateSearchParams
 
   const actualStateRef = useRef<IMySearchState>(state)
   // in place of original `setState`
@@ -137,6 +166,11 @@ const MySearch = ():React.ReactElement => {
               searchType: newSearchType,
               numActiveRow: newNumActiveRow
             })
+            setStateSearchParams({
+              ...actualStateSearchParamsRef.current,
+              altSearchData: newSearchData,
+              altSearchType: newSearchType==='' ? 'все' : newSearchType
+            })
           },
           // Примечание: важно обрабатывать ошибки именно здесь, а не в блоке catch(),
           // чтобы не перехватывать исключения из ошибок в самих компонентах.
@@ -165,29 +199,23 @@ const MySearch = ():React.ReactElement => {
           searchType: newSearchType,
           numActiveRow: newNumActiveRow
         })
+        setStateSearchParams({
+          ...actualStateSearchParamsRef.current,
+          altSearchData: newSearchData,
+          altSearchType: newSearchType==='' ? 'все' : newSearchType
+        })
       }
     }
   })
 
-  const changeFilter = (event:any) => {
-    console.log('changeFilter')
-    // setState({
-    //   ...actualStateRef.current,
-    //   searchData: event.target.value
-    // });
-  }
-
-  const changeSearchType = (event:any) => {
-    console.log('changeSearchType')
-    // setState({
-    //   ...actualStateRef.current,
-    //   searchType: event.target.value
-    // });
-  }
-
+  
   const searchClick = (event:any) => {
-    const searchDataValue:string = inputSearchData.current.value
-    const searchTypeValue:string = inputSearchType.current.value
+    const {altSearchData, altSearchType} = actualStateSearchParamsRef.current
+    // console.log('altSearchData', altSearchData)
+    // console.log('altSearchType', altSearchType)
+    const searchDataValue:string = altSearchData
+    const searchTypeValue:string = altSearchType
+    //console.log('inputSearchType ::::::::: ',inputSearchType.current.props.defaultValue)  // .state,searchTypeValue)
 
     let searchURL:string = ''
     let searchData64:string = searchDataValue.trim()
@@ -211,9 +239,12 @@ const MySearch = ():React.ReactElement => {
   }
 
   const searchClear = (event:any) => {
-    // console.log('searchClear')
-    inputSearchData.current.value = ''
-    inputSearchType.current.value = 'все'
+    // console.log('searchClear')    
+    setStateSearchParams({
+      ...actualStateSearchParamsRef.current,
+      altSearchData: '',
+      altSearchType: 'все'
+    })
     push('/search')
   }
 
@@ -362,22 +393,30 @@ const MySearch = ():React.ReactElement => {
 
   const searchTypeKbd = (event_keyCode:number):boolean => {
     let kbdEventStillActive:boolean = true
+   
+    // const el:any = getFocusedElement()
+    // console.log('el.id',el.id)
+    //console.log('isSelectOpen ? ',isSelectOpen.current)
+    if(!isSelectOpen.current) {
+      if(event_keyCode === 38) {
+        //console.log('searchTypeKbd KeyUP !')
+        document.getElementById('sExpression')?.focus()
+        kbdEventStillActive = false
+      }
 
-    if(event_keyCode === 38) {
-      //console.log('searchTypeKbd KeyUP !')
-      document.getElementById('sExpression')?.focus()
-      kbdEventStillActive = false
+      if(event_keyCode === 40) {
+        //console.log('searchTypeKbd KeyDown !')
+        document.getElementById('bSearch')?.focus()
+        kbdEventStillActive = false
+      }
+
+      if(event_keyCode === 13) {
+        //console.log('searchClickKbd Enter !')      
+        // document.getElementById('sType')?.toggle()
+        kbdEventStillActive = false
+      }
     }
-
-    if(event_keyCode === 40) {
-      //console.log('searchTypeKbd KeyDown !')
-      document.getElementById('bSearch')?.focus()
-      kbdEventStillActive = false
-    }
-
-    if(event_keyCode === 13) {
-      //console.log('searchClickKbd Enter !')      
-      // document.getElementById('sType')?.toggle()
+    else {
       kbdEventStillActive = false
     }
 
@@ -387,20 +426,20 @@ const MySearch = ():React.ReactElement => {
   const searchClickKbd = (event_keyCode:number):boolean => {
     let kbdEventStillActive:boolean = true
 
-    if(event_keyCode === 38) {
-      //console.log('searchClickKbd KeyUP !')
+    if(event_keyCode === 38 || event_keyCode === 37) {
+      //console.log('searchClickKbd KeyUP OR KeyLeft !')
       document.getElementById('sType')?.focus()
       kbdEventStillActive = false
     }
 
-    if(event_keyCode === 40) {
-      //console.log('searchClickKbd KeyDown !')
+    if(event_keyCode === 40 || event_keyCode === 39) {
+      //console.log('searchClickKbd KeyDown OR KeyRight!')
       document.getElementById('bClear')?.focus()
       kbdEventStillActive = false
     }
 
     if(event_keyCode === 13) {
-      //console.log('searchClickKbd Enter !')
+      console.log('searchClickKbd Enter !')
       searchClick(null)
       kbdEventStillActive = false
     }
@@ -410,9 +449,10 @@ const MySearch = ():React.ReactElement => {
   
   const searchClearKbd = (event_keyCode:number):boolean => {
     let kbdEventStillActive:boolean = true
+    // console.log('searchClearKbd : ', event_keyCode)
 
-    if(event_keyCode === 38) {
-      //console.log('searchClearKbd KeyUP !')
+    if(event_keyCode === 38 || event_keyCode === 37) {
+      //console.log('searchClearKbd KeyUP OR KeyLeft !')
       document.getElementById('bSearch')?.focus()
       kbdEventStillActive = false
     }
@@ -422,9 +462,9 @@ const MySearch = ():React.ReactElement => {
       searchClear(null)
       kbdEventStillActive = false
     }
-
-    if(event_keyCode === 40) {
-      //console.log('searchClearKbd KeyDown !')
+    
+    if(event_keyCode === 40 || event_keyCode === 39) {
+      // console.log('searchClearKbd KeyDown  OR KeyRight !')
       document.getElementById('bClear')?.blur()
       kbdEventStillActive = false
     }
@@ -437,39 +477,69 @@ const MySearch = ():React.ReactElement => {
     parentFocusedElementListener: [searchKbd, searchTypeKbd, searchClickKbd, searchClearKbd]
   }
   
+  // handleFormSubmit = event => {
+  //   event.preventDefault();
+  //   const name = event.target.elements.name.value;
+  //   const description = event.target.elements.description.value;
+  //   const category = event.target.elements.category.value;
+  //   console.log(name, description, this.refs.category.value);
+  // };
+  // console.log('Render: searchType',searchType)  
+  const { Option } = Select;
   // ======================================== RETURN ===========================================
   if (!isDetailed)
     return (
       <div className='MySearch'>
-        <div className='MySearchLeftPanel'>
-          <div className='hSearch'>
-            <label htmlFor='sExpression' id='lsExpression'>
-              Поиск:
-            </label>
-            <input
-              ref={inputSearchData}
-              type='text'
-              className='input-text'
-              id='sExpression'
-              defaultValue={searchData}
-              onChange={changeFilter}              
-            />
+        <div className='MySearchLeftPanel'>          
+          <Form.Item style={{ marginTop: 8 }}>
+          <Row>
+              <Col className='lblField' style={{ marginLeft: 1, width: 50, textAlign: "left" }}>Поиск:</Col>
+              <Col>
+                <Input id='sExpression'
+                  value={altSearchData}
+                  style={{ marginLeft: 5, width: 150 }} size='small'
+                  onChange={event => {                    
+                    console.log('event.target.value', event.target.value)
+                    setStateSearchParams({...actualStateSearchParamsRef.current, altSearchData: event.target.value})
+                  }}
+                >
+                </Input>
+              </Col>
+            </Row>
+            <Row style={{ marginTop: 8 }}>
+              <Col className='lblField' style={{ marginLeft: 1, width: 50, textAlign: "left" }}>Ресурс:</Col>
+              <Col>
+                <Select id='sType' ref={inputSearchType}
+                  value={altSearchType}
+                  style={{ marginLeft: 5, width: 150 }} size='small'
+                  onChange={value => {
+                    // console.log('Select onChange', value)
+                    // inputSearchType.current.state = value
+                    setStateSearchParams({...actualStateSearchParamsRef.current, altSearchType: value})
+                  }}
+                  onDropdownVisibleChange={open => {
+                    // console.log('Select open', open)
+                    isSearchTypeSelectOpen.current = open
+                  }}
+                  onInputKeyDown={event => {
+                    // console.log('Select onInputKeyDown', event.keyCode, isSearchTypeSelectOpen.current)
+                    //             KeyDown                  KeyUP
+                    if(event.keyCode === 40 || event.keyCode === 38) {
+                      isSelectOpen.current = isSearchTypeSelectOpen.current   // Save open_state before it changes after key-event
+                    }
+                  }}                  
+                >
+                  <Option value="газ">газ</Option>
+                  <Option value="нефть">нефть</Option>
+                  <Option value="уголь">уголь</Option>
+                  <Option value="все">- все ресурсы -</Option>
+                </Select>
+              </Col>
+            </Row>
+          </Form.Item>
+          <div className='hSearch'>            
           </div>
-          <div className='hSearchType'>
-            <label htmlFor='sType' id='lsType'>
-              Ресурс:
-            </label>
-            <select
-              ref={inputSearchType}
-              id='sType'
-              defaultValue={searchType}
-              onChange={changeSearchType}>
-
-              <option value='газ'>газ</option>
-              <option value='нефть'>нефть</option>
-              <option value='уголь'>уголь</option>
-              <option value='все'>- все ресурсы -</option>
-            </select>
+          <div className='hSearchType'>            
           </div>
           <div className='hButtons'>
             <button className='bSearch' id='bSearch' onClick={searchClick}>

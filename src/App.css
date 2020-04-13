@@ -1,4 +1,12 @@
 @charset "UTF-8";
+.App {
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+  text-align: center; }
+
+.NavWorkarea {
+  flex: 1;
+  display: flex; }
+
 .Header,
 .Footer {
   flex: 1;
@@ -149,6 +157,10 @@
 .tddesc {
   text-align: left;
   width: 15em; }
+
+.author {
+  text-align: left;
+  width: 10em; }
 
 .MySearch,
 .MyDetailedF9 {
@@ -398,11 +410,3 @@
 .bBack:hover {
   border-left: 9px solid #4638ff;
   border-right: 9px solid #4638ff; }
-
-.App {
-  font-family: 'Trebuchet MS', 'Lucida Sans';
-  text-align: center; }
-
-.NavWorkarea {
-  flex: 1;
-  display: flex; }

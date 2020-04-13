@@ -1,12 +1,6 @@
-@import './header.scss';
-@import './table.scss';
-@import './mysearch.scss';
-@import './mylist.scss';
-@import './myfiles.scss';
-@import './mydetailed.scss';
 
 .App {
-  font-family: 'Trebuchet MS', 'Lucida Sans';
+  font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
   text-align: center;
 }
 
@@ -14,3 +8,11 @@
   flex: 1;
   display: flex;
 }
+
+@import './header.scss';
+@import './table.scss';
+@import './mysearch.scss';
+@import './mylist.scss';
+@import './myfiles.scss';
+@import './mydetailed.scss';
+

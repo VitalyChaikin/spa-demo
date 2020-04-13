@@ -147,3 +147,7 @@
 .tddesc {
   @include stdColumnStyleLeft(15em);
 }
+
+.author {
+  @include stdColumnStyleLeft(10em);
+}

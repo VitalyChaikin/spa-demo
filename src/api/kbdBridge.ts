@@ -18,7 +18,7 @@ const getListenerIndex = (focused_element:any, parentListeners:IParentListener):
   return listenerIndex
 }
 
-const getFocusedElement = ():Element | null => {
+export const getFocusedElement = ():Element | null => {
   let focused_element:Element | null = null;
   if (
     document.hasFocus() &&

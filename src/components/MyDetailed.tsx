@@ -2,6 +2,8 @@ import React from 'react'
 import { useState, useEffect, useRef } from 'react'
 // import { useStores } from '../hooks/use-stores'
 import { FuncChangeDetailed } from './MySearch'
+import { Form, Input, Row, Col, Button, Checkbox, InputNumber, Select } from 'antd';
+
 
 interface IMyDetailedState {
   isLoaded: boolean,
@@ -16,8 +18,19 @@ export interface IMyDetailedProps {
   changeDetailed: FuncChangeDetailed
 }
 
+
 const MyDetailed = (props:IMyDetailedProps) => {
   const { data: arrData, idDetailed: newIdDetailed, changeDetailed } = props
+
+  const [form] = Form.useForm()
+  
+  const layout = {    
+    labelCol: { span: 10 },
+    wrapperCol: { span: 15 },
+  }
+  const tailLayout = {
+    wrapperCol: { offset: 8, span: 16 },
+  };
 
   //const { myStore } = useStores()
   const inputId:any = useRef<HTMLElement>(null)
@@ -36,6 +49,18 @@ const MyDetailed = (props:IMyDetailedProps) => {
 
   const { itemsView, txtJson } = state
 
+  // Init form values
+  useEffect(() => {
+    form.setFieldsValue({      
+      id:   itemsView[0].id,
+      type: itemsView[0].type,
+      name: itemsView[0].name,
+      price:itemsView[0].price,
+      desc: itemsView[0].desc
+    });
+  }, []);
+
+
   // let isPropsChanged = false
   // //console.log('1. newIdDetailed: ', newIdDetailed, 'idDetailed:', idDetailed, 'arrData.length', arrData.length, 'itemsView.length', itemsView.length)
   // if(newIdDetailed !== idDetailed) // || arrData.length !== itemsView.length)
@@ -50,12 +75,12 @@ const MyDetailed = (props:IMyDetailedProps) => {
     // console.log('2. useEffect: itemsView.length', itemsView.length)
     if (itemsView.length === 1) {
       // console.log('3. useEffect: itemsView[0].id', itemsView[0].id)
-      inputId.current.value = itemsView[0].id
-      inputName.current.value = itemsView[0].name
-      inputType.current.value = itemsView[0].type
-      inputPrice.current.value = itemsView[0].price
-      inputDesc.current.value = itemsView[0].desc
-      inputInfo.current.value = itemsView[0].info
+      // inputId.current.value = itemsView[0].id
+      // inputName.current.value = itemsView[0].name
+      // inputType.current.value = itemsView[0].type
+      // inputPrice.current.value = itemsView[0].price
+      // inputDesc.current.value = itemsView[0].desc
+      // inputInfo.current.value = itemsView[0].info
     }
     fetch('http://localhost:3000/filesdata.txt')
       .then(res => res.text())
@@ -84,6 +109,75 @@ const MyDetailed = (props:IMyDetailedProps) => {
     changeDetailed()
   }
 
+  const onFinish = (values:any) => {
+    console.log(values);
+  };
+
+  const antForm = () => {
+    const { TextArea } = Input
+    const { Option } = Select;
+    return (
+    <div id='txt_1'>
+      <Form labelCol={{ span: 8 }} wrapperCol={{ span: 24 }} size='small' form={form} name="detailedInfo" onFinish={onFinish}>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>id#:</Col>
+            <Col>
+              <InputNumber name="id" value={itemsView[0].id} style={{ marginLeft: 10, width: 100}} />
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>Ресурс:</Col>
+            <Col>              
+              <Select defaultValue={itemsView[0].type} style={{ marginLeft: 10, width: 100 }} >
+                <Option value="газ">газ</Option>
+                <Option value="нефть">нефть</Option>
+                <Option value="уголь">уголь</Option>                
+              </Select>
+            </Col>
+          </Row>          
+        </Form.Item>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>Марка:</Col>
+            <Col>
+              <Input name="name" value={itemsView[0].name} style={{ marginLeft: 10, width: 150 }} />
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>Цена:</Col>
+            <Col>
+              <InputNumber name="price" value={itemsView[0].price} style={{ marginLeft: 10, width: 100 }} />
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>Описание:</Col>
+            <Col>
+              <Input name="desc" value={itemsView[0].desc} style={{ marginLeft: 10, width: 250 }} />
+            </Col>
+          </Row>          
+        </Form.Item>
+        <Form.Item style={{ marginBottom: 8 }}>
+          <Row>
+            <Col className='lblField' style={{ marginLeft: 5, width: 100, textAlign: "right" }}>Информация:</Col>
+            <Col>
+              <TextArea rows={5} name="info" value={itemsView[0].info} style={{ marginLeft: 10, width: 550 }} />
+            </Col>
+          </Row>          
+        </Form.Item>
+      </Form>
+    </div> 
+    )
+  }
+
+  // return (antForm())
+
   return (
     <div className='MyDetailed'>
       <div className='tabs'>
@@ -99,68 +193,8 @@ const MyDetailed = (props:IMyDetailedProps) => {
         <input type='radio' name='inset' value='' id='tab_4' />
         <label htmlFor='tab_4'>Что есть в проекте</label>
 
-        <div id='txt_1'>
-          <div className='inputField'>
-            <span className='inputFieldLabel'>id#</span>
-            <input
-              ref={inputId}
-              type='text'
-              className='input-text'
-              id='inpuId'
-            />
-          </div>
-          <div className='inputField'>
-            <span className='inputFieldLabel' id='lblinputType'>
-              Ресурс
-            </span>
-            <select ref={inputType} className='input-text' id='inputType'>
-              <option value='газ'>газ</option>
-              <option value='нефть'>нефть</option>
-              <option value='уголь'>уголь</option>
-            </select>
-          </div>
-          <div className='inputField'>
-            <span className='inputFieldLabel' id='lblinputName'>
-              Марка&nbsp;
-            </span>
-            <input
-              ref={inputName}
-              type='text'
-              className='input-text'
-              id='inputName'
-            />
-          </div>
-          <div className='inputField'>
-            <span className='inputFieldLabel' id='lblinputPrice'>
-              Цена&nbsp;&nbsp;&nbsp;
-            </span>
-            <input
-              ref={inputPrice}
-              type='text'
-              className='input-text'
-              id='inputPrice'
-            />
-          </div>
-          <div className='inputField'>
-            <span className='inputFieldLabel'>Описание</span>
-            <input
-              ref={inputDesc}
-              type='text'
-              className='input-text'
-              id='inputDesc'
-            />
-          </div>
-          <div className='inputField'>
-            <span className='inputFieldLabel'>Информация</span>
-            <br />
-            <textarea
-              ref={inputInfo}              
-              className='input-text'
-              id='inputInfo'
-              rows={5}
-              cols={35}
-            />
-          </div>
+        <div id='txt_1'>          
+          {antForm()}          
           <div className='inputField'>
             <button className='bBack' onClick={onClickBackButton}>
               Назад
